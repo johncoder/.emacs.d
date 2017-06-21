@@ -12,7 +12,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (handlebars-mode counsel bm magit atom-one-dark-theme spaceline-all-the-icons all-the-icons monochrome-theme use-package base16-theme))))
+    (csharp-mode handlebars-mode counsel bm magit atom-one-dark-theme spaceline-all-the-icons all-the-icons monochrome-theme use-package base16-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

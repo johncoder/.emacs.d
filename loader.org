@@ -331,7 +331,8 @@ point reaches the beginning or end of the buffer, stop there."
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :ensure t
-  :bind (("C-|" . magit-status)))
+  :config
+  (global-set-key (kbd "C-c m") 'magit-status))
 #+END_SRC
 
 * Programming
@@ -341,6 +342,11 @@ point reaches the beginning or end of the buffer, stop there."
 ** C/C++
 
 ** C#
+
+#+BEGIN_SRC emacs-lisp
+(use-package csharp-mode
+  :ensure t)
+#+END_SRC
 
 ** JavaScript
 
