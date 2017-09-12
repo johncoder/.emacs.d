@@ -52,9 +52,9 @@ Each archive will write its files in a separate archive directory.
 #+BEGIN_SRC emacs-lisp
 (require 'package)
 
-(if (eq system-type 'windows-nt)
-  (setenv "PATH" (concat "E:/msys64/usr/bin;" (getenv "PATH"))))
-(push "E:/msys64/usr/bin;" exec-path)
+(when (eq system-type 'windows-nt)
+  (setenv "PATH" (concat "E:/msys64/usr/bin;" (getenv "PATH")))
+  (push "E:/msys64/usr/bin;" exec-path))
 #+END_SRC
 
 #+NAME: credmp-package-infrastructure
