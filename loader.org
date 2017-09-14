@@ -336,7 +336,12 @@ point reaches the beginning or end of the buffer, stop there."
 #+END_SRC
 
 * Programming
-
+#+BEGIN_SRC emacs-lisp
+(use-package rest-client
+  :ensure t)
+(use-package ob-restclient
+  :ensure t)
+#+END_SRC
 ** Lisp
 
 ** C/C++
