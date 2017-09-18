@@ -10,9 +10,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(delete-selection-mode t)
  '(package-selected-packages
    (quote
-    (ob-restclient rest-client csharp-mode handlebars-mode counsel bm magit atom-one-dark-theme spaceline-all-the-icons all-the-icons monochrome-theme use-package base16-theme)))
+    (docker sql-postgres ob-restclient rest-client csharp-mode handlebars-mode counsel bm magit atom-one-dark-theme spaceline-all-the-icons all-the-icons monochrome-theme use-package base16-theme)))
  '(projectile-mode t nil (projectile)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

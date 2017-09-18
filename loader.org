@@ -224,6 +224,7 @@ I really wanted to try and make [[https://github.com/domtronn/all-the-icons.el/w
   :ensure t
   :config ())
 (add-hook 'find-file-hook (lambda () (linum-mode 1)))
+(delete-selection-mode)
 #+END_SRC
 
 ** Moving Around
@@ -344,6 +345,10 @@ point reaches the beginning or end of the buffer, stop there."
 #+END_SRC
 ** Lisp
 
+** Python
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
 ** C/C++
 
 ** C#
@@ -376,6 +381,28 @@ point reaches the beginning or end of the buffer, stop there."
   (add-hook 'web-mode-hook 'my-web-mode-hook))
 #+END_SRC
 
+** PostgreSQL
+In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
+
+The default connection prompts do not include a port number, thus include it ([[https://stackoverflow.com/questions/12613/specify-a-port-number-in-emacs-sql-mysql][source]]):
+
+#+BEGIN_SRC emacs-lisp
+(use-package sql-postgres
+  :ensure t
+  :init
+  (progn
+    (require 'sql)
+    (add-to-list 'sql-postgres-login-params '(port))))
+#+END_SRC
+
+** Docker
+This was immediately helpful in managing docker containers from within emacs. 10/10, so far!
+#+BEGIN_SRC emacs-lisp
+(use-package docker
+  :ensure t)
+(use-package dockerfile-mode
+  :ensure t)
+#+END_SRC
 * Keybindings
 ** Other Window
 #+BEGIN_SRC emacs-lisp
