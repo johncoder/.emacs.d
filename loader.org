@@ -372,38 +372,38 @@ Someday, maybe.
   (use-package org
     :ensure org-plus-contrib)
 
+  (require 'org-habit)
+
   (define-key global-map "\C-ca" 'org-agenda)
   (define-key global-map "\C-cc" 'org-capture)
+  (define-key global-map "\C-cl" 'org-store-link)
 
-  (setq org-agenda-files (list "~/org/work.org"
-                               "~/org/home.org"))
+  (setq org-agenda-files (list "~/org"))
 
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'org-display-inline-images)
 
   (setq org-timer-done-hook nil)
-  (add-hook 'org-timer-done-hook
-            (lambda ()
-              (shell-command "afplay -v 5 ~/Downloads/level-up.mp3")))
+  (when (eq system-type 'darwin)
+    (add-hook 'org-timer-done-hook
+              (lambda ()
+                (shell-command "afplay -v 5 ~/Downloads/level-up.mp3"))))
 
   (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
-          org-startup-indented t
-          org-agenda-span 'day
-  ;	org-log-into-drawer t
-          org-clock-idle-time 10
-          org-return-follows-link t
-          org-special-ctrl-a/e t
-          org-pretty-entities t
-          org-pretty-entities-include-sub-superscripts t
-          org-agenda-skip-scheduled-if-deadline-is-shown t
-          org-drill-learn-fraction 0.3
-          org-log-done 'time)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-trello
-    :ensure t)
+        org-startup-indented t
+        org-agenda-span 'day
+        ;; org-log-into-drawer t
+        org-clock-idle-time 10
+        org-return-follows-link t
+        org-special-ctrl-a/e t
+        org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts t
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-drill-learn-fraction 0.3
+        org-log-done 'time)
+  (add-to-list 'org-modules 'org-habit t)
+  (setq org-habit-graph-column 80)
 #+END_SRC
 
 ** Capture Templates
@@ -419,12 +419,15 @@ Someday, maybe.
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
         '(
+           ("a" "Agenda Item"          entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
            ("c" "Clock item"           item  (clock) "  - %i%?")
            ("w" "Work Note"            entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
            ("j" "Append journal entry" entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
            ("t" "Micro Blog Entry"     plain (file "~/org/micro-blog.org")   "* %U by @johncoder\n%?" :prepend t :kill-buffer t)
           ))
 #+END_SRC
+
+
 * Version Control
 
 #+NAME: magit
