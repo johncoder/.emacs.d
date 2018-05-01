@@ -188,6 +188,12 @@ The default behavior of Emacs is to litter the same directory with temporary fil
 #+BEGIN_SRC emacs-lisp
 ;; (setq ns-pop-up-frames nil)
 #+END_SRC
+** Platform Specific
+When using dired on MacOS, you get an error like =ls does not support --dired=. See [[https://stackoverflow.com/questions/25125200/emacs-error-ls-does-not-support-dired][this question on SO]].
+#+BEGIN_SRC emacs-lisp
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired nil))
+#+END_SRC
 * Look and feel
 
 Ditch the lousy bars and obnoxious bell.
@@ -201,6 +207,9 @@ Ditch the lousy bars and obnoxious bell.
   (setq ring-bell-function 'my-bell-function)
   (setq visible-bell nil)
   (setq column-number-mode t)
+  (setq-default cursor-type 'bar)
+
+  (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
 #+NAME: credmp-package-installer
@@ -221,12 +230,19 @@ Ditch the lousy bars and obnoxious bell.
   ;;  :ensure t
   ;;  :config
   ;;  (load-theme 'github t))
-  (use-package arjen-grey-theme
+  ;; (use-package arjen-grey-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'arjen-grey t))
+  (use-package eink-theme
     :ensure t
     :config
-    (load-theme 'arjen-grey t))
+    (load-theme 'eink t))
   (if (eq system-type 'windows-nt)
-      (set-face-attribute 'default nil :font "Consolas" :height 110))
+      (set-face-attribute 'default nil :font "Consolas" :height 140))
+  (if (eq system-type 'darwin)
+      (set-face-attribute 'default nil :font "NotCourierSans" :height 140))
+  (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
 ** Icons
@@ -258,11 +274,20 @@ I really wanted to try and make [[https://github.com/domtronn/all-the-icons.el/w
 
 ** Editor
 #+BEGIN_SRC emacs-lisp
-  (use-package linum
-    :ensure t
-    :config ())
-  (add-hook 'find-file-hook (lambda () (linum-mode 1)))
-  (delete-selection-mode)
+    ;; (use-package linum
+    ;;   :ensure t
+    ;;   :config ())
+    ;; (add-hook 'find-file-hook (lambda () (linum-mode 1)))
+    (delete-selection-mode)
+
+  ;; (use-package centered-window
+  ;;   :ensure t
+  ;;   :config
+  ;;   (centered-window-mode t))
+  ;; (use-package centered-cursor-mode
+  ;;   :ensure t
+  ;;   :config
+  ;;   (global-centered-cursor-mode t))
 #+END_SRC
 
 ** Moving Around
@@ -444,6 +469,10 @@ Someday, maybe.
     :ensure t)
   (use-package ob-restclient
     :ensure t)
+  (use-package dumb-jump
+    :ensure t
+    :config
+    (global-set-key (kbd "<f12>") 'dumb-jump-go))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
