@@ -7,3 +7,8 @@ elpa
 loader.el
 projectile-bookmarks.eld
 projectile.cache
+.trello
+bookmarks
+url
+tramp
+request
