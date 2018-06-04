@@ -242,7 +242,7 @@ Ditch the lousy bars and obnoxious bell.
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
       (set-face-attribute 'default nil :font "Inconsolata" :height 140))
-  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'default nil :height 120)
 #+END_SRC
 
 ** Icons
@@ -472,14 +472,29 @@ Someday, maybe.
   (use-package dumb-jump
     :ensure t
     :config
-    (global-set-key (kbd "<f12>") 'dumb-jump-go))
+    (global-set-key (kbd "<f12>") 'dumb-jump-go)
+    (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (setq indent-tabs-mode nil)
+  (setq-default indent-tabs-mode nil)
+  (setq c-default-style "bsd"
+        c-basic-indent 4
+        c-basic-offset 4
+        tab-width 4
+        indent-tabs-mode nil)
 #+END_SRC
 ** Lisp
+#+BEGIN_SRC emacs-lisp
+(use-package slime
+  :ensure t)
 
+(use-package clojure-mode
+  :ensure cider)
+
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq inferior-lisp-program "/usr/bin/sbcl")
+#+END_SRC
 ** Python
 #+BEGIN_SRC emacs-lisp
   ;(setq python-shell-interpreter "nix-shell python")
@@ -499,6 +514,8 @@ Someday, maybe.
 
 ** JavaScript
 #+BEGIN_SRC emacs-lisp
+  (use-package jsx-mode
+    :ensure t)
   (add-hook 'js-mode-hook (lambda () (setq js-indent-level 2)))
   (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
