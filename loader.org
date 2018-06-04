@@ -242,7 +242,7 @@ Ditch the lousy bars and obnoxious bell.
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
       (set-face-attribute 'default nil :font "Inconsolata" :height 140))
-  (set-face-attribute 'default nil :height 120)
+  (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
 ** Icons
@@ -250,8 +250,8 @@ Ditch the lousy bars and obnoxious bell.
 Screen real estate is precious, so iconography seems worthwhile to try. This package provides icons that can be used in other configurations.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-    :ensure t)
+  ;; (use-package all-the-icons
+  ;;   :ensure t)
 #+END_SRC
 
 ** Mode Line
@@ -259,10 +259,10 @@ Screen real estate is precious, so iconography seems worthwhile to try. This pac
 I really wanted to try and make [[https://github.com/domtronn/all-the-icons.el/wiki/Mode-Line][all-the-icons mode line]] work, but it eludes me. Instead I'm punting and going with [[https://github.com/domtronn/spaceline-all-the-icons.el][spaceline-all-the-icons]].
 
 #+BEGIN_SRC emacs-lisp
-  (use-package mode-icons
-    :ensure t
-    :config
-    (mode-icons-mode t))
+  ;; (use-package mode-icons
+  ;;   :ensure t
+  ;;   :config
+  ;;   (mode-icons-mode t))
 
   ;; (use-package spaceline
   ;;  :ensure t)
