@@ -492,8 +492,10 @@ Someday, maybe.
 (use-package clojure-mode
   :ensure cider)
 
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "/usr/bin/sbcl")
+(let ((quicklisp-filename "~/quicklisp/slime-helper.el"))
+  (when (file-exists-p quicklisp-filename)
+    (load (expand-file-name quicklisp-filename)))
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
 #+END_SRC
 ** Python
 #+BEGIN_SRC emacs-lisp
