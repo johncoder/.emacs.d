@@ -230,18 +230,18 @@ Ditch the lousy bars and obnoxious bell.
   ;;  :ensure t
   ;;  :config
   ;;  (load-theme 'github t))
-  ;; (use-package arjen-grey-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'arjen-grey t))
-  (use-package eink-theme
+  (use-package arjen-grey-theme
     :ensure t
     :config
-    (load-theme 'eink t))
+    (load-theme 'arjen-grey t))
+  ;; (use-package eink-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'eink t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
-      (set-face-attribute 'default nil :font "NotCourierSans" :height 140))
+      (set-face-attribute 'default nil :font "Inconsolata" :height 140))
   (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
