@@ -230,19 +230,19 @@ Ditch the lousy bars and obnoxious bell.
   ;;  :ensure t
   ;;  :config
   ;;  (load-theme 'github t))
-  ;; (use-package arjen-grey-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'arjen-grey t))
-  (use-package eink-theme
+  (use-package arjen-grey-theme
     :ensure t
     :config
-    (load-theme 'eink t))
+    (load-theme 'arjen-grey t))
+  ;; (use-package eink-theme
+  ;;     :ensure t
+  ;;     :config
+  ;;     (load-theme 'eink t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
       (set-face-attribute 'default nil :font "NotCourierSans" :height 140))
-  (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'default nil :height 120)
 #+END_SRC
 
 ** Icons
@@ -472,7 +472,8 @@ Someday, maybe.
   (use-package dumb-jump
     :ensure t
     :config
-    (global-set-key (kbd "<f12>") 'dumb-jump-go))
+    (global-set-key (kbd "<f12>") 'dumb-jump-go)
+    (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
