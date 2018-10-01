@@ -208,7 +208,7 @@ Ditch the lousy bars and obnoxious bell.
   (setq visible-bell nil)
   (setq column-number-mode t)
   (setq-default cursor-type 'bar)
-
+  (setq initial-buffer-choice 'elfeed)
   (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
@@ -429,8 +429,26 @@ Someday, maybe.
         org-log-done 'time)
   (add-to-list 'org-modules 'org-habit t)
   (setq org-habit-graph-column 80)
-#+END_SRC
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((dot . t) (python . t) (restclient . t)))
+  (setq org-confirm-babel-evaluate nil)
 
+  (use-package elfeed-org
+    :ensure elfeed)
+
+  (use-package elfeed-goodies
+    :ensure elfeed)
+
+  (require 'elfeed)
+  (require 'elfeed-org)
+  (require 'elfeed-goodies)
+  (elfeed-org)
+  (elfeed-goodies/setup)
+  (setq rmh-elfeed-org-files '("/Users/johnnelson/org/rss.org"))
+  (setf elfeed-db-directory "/Users/johnnelson/org/elfeed-db")
+  (setf elfeed-goodies/entry-pane-position 'bottom)
+#+END_SRC
 ** Capture Templates
 
 | Placeholder | Description                 |
@@ -452,6 +470,15 @@ Someday, maybe.
           ))
 #+END_SRC
 
+** Quick Tools
+In the web development world it's pretty common to use uuids, and while working in documentation or sample code it has been helpful to generate sample values.
+#+BEGIN_SRC emacs-lisp
+(require 'org-id)
+(defun uuid ()
+  "Inserts a uuid"
+  (interactive)
+  (insert (org-id-uuid)))
+#+END_SRC
 
 * Version Control
 
@@ -464,6 +491,22 @@ Someday, maybe.
 #+END_SRC
 
 * Programming
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.(cs|vb)*html?\\'" . web-mode))
+
+    (defun my-web-mode-hook ()
+      "Hooks for Web Mode."
+      (setq web-mode-enable-auto-closing t)
+      (setq web-mode-enable-auto-quoting t)
+      (setq web-mode-markup-indent-offset 2))
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
   (use-package restclient
     :ensure t)
@@ -522,27 +565,13 @@ Someday, maybe.
   (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
 
-** Markup
+React!
+
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package handlebars-mode
-  ;;   :ensure t)
-  (use-package web-mode
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.(cs|vb)*html?\\'" . web-mode))
-
-    (defun my-web-mode-hook ()
-      "Hooks for Web Mode."
-      (setq web-mode-enable-auto-closing t)
-      (setq web-mode-enable-auto-quoting t)
-      (setq web-mode-markup-indent-offset 2))
-
-    (add-hook 'web-mode-hook 'my-web-mode-hook))
+  (use-package rjsx-mode
+    :ensure t)
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 #+END_SRC
-
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
 
