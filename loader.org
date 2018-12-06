@@ -435,19 +435,19 @@ Someday, maybe.
     '((dot . t) (python . t) (restclient . t)))
   (setq org-confirm-babel-evaluate nil)
 
+  (require 'elfeed)
   (use-package elfeed-org
-    :ensure elfeed)
+    :ensure t)
 
   (use-package elfeed-goodies
-    :ensure elfeed)
+    :ensure t)
 
-  (require 'elfeed)
-  (require 'elfeed-org)
-  (require 'elfeed-goodies)
+  ;; (require 'elfeed-org)
+  ;; (require 'elfeed-goodies)
   (elfeed-org)
   (elfeed-goodies/setup)
-  (setq rmh-elfeed-org-files '("/Users/johnnelson/org/rss.org"))
-  (setf elfeed-db-directory "/Users/johnnelson/org/elfeed-db")
+  (setq rmh-elfeed-org-files '("~/org/rss.org"))
+  (setf elfeed-db-directory "~/org/elfeed-db")
   (setf elfeed-goodies/entry-pane-position 'bottom)
 #+END_SRC
 ** Capture Templates
@@ -505,7 +505,7 @@ In the web development world it's pretty common to use uuids, and while working 
       "Hooks for Web Mode."
       (setq web-mode-enable-auto-closing t)
       (setq web-mode-enable-auto-quoting t)
-      (setq web-mode-markup-indent-offset 2))
+      (setq web-mode-markup-indent-offset 2)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
