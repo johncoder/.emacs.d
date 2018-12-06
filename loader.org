@@ -208,7 +208,7 @@ Ditch the lousy bars and obnoxious bell.
   (setq visible-bell nil)
   (setq column-number-mode t)
   (setq-default cursor-type 'bar)
-
+  (setq initial-buffer-choice 'elfeed)
   (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
@@ -235,14 +235,14 @@ Ditch the lousy bars and obnoxious bell.
     :config
     (load-theme 'arjen-grey t))
   ;; (use-package eink-theme
-  ;;     :ensure t
-  ;;     :config
-  ;;     (load-theme 'eink t))
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'eink t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
-      (set-face-attribute 'default nil :font "NotCourierSans" :height 140))
-  (set-face-attribute 'default nil :height 120)
+      (set-face-attribute 'default nil :font "Inconsolata" :height 140))
+  (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
 ** Icons
@@ -250,8 +250,8 @@ Ditch the lousy bars and obnoxious bell.
 Screen real estate is precious, so iconography seems worthwhile to try. This package provides icons that can be used in other configurations.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-    :ensure t)
+  ;; (use-package all-the-icons
+  ;;   :ensure t)
 #+END_SRC
 
 ** Mode Line
@@ -259,10 +259,10 @@ Screen real estate is precious, so iconography seems worthwhile to try. This pac
 I really wanted to try and make [[https://github.com/domtronn/all-the-icons.el/wiki/Mode-Line][all-the-icons mode line]] work, but it eludes me. Instead I'm punting and going with [[https://github.com/domtronn/spaceline-all-the-icons.el][spaceline-all-the-icons]].
 
 #+BEGIN_SRC emacs-lisp
-  (use-package mode-icons
-    :ensure t
-    :config
-    (mode-icons-mode t))
+  ;; (use-package mode-icons
+  ;;   :ensure t
+  ;;   :config
+  ;;   (mode-icons-mode t))
 
   ;; (use-package spaceline
   ;;  :ensure t)
@@ -432,9 +432,24 @@ Someday, maybe.
   (setq org-habit-graph-column 80)
   (org-babel-do-load-languages
     'org-babel-load-languages
-    '((dot . t)))
-#+END_SRC
+    '((dot . t) (python . t) (restclient . t)))
+  (setq org-confirm-babel-evaluate nil)
 
+  (use-package elfeed-org
+    :ensure elfeed)
+
+  (use-package elfeed-goodies
+    :ensure elfeed)
+
+  (require 'elfeed)
+  (require 'elfeed-org)
+  (require 'elfeed-goodies)
+  (elfeed-org)
+  (elfeed-goodies/setup)
+  (setq rmh-elfeed-org-files '("/Users/johnnelson/org/rss.org"))
+  (setf elfeed-db-directory "/Users/johnnelson/org/elfeed-db")
+  (setf elfeed-goodies/entry-pane-position 'bottom)
+#+END_SRC
 ** Capture Templates
 
 | Placeholder | Description                 |
@@ -456,6 +471,15 @@ Someday, maybe.
           ))
 #+END_SRC
 
+** Quick Tools
+In the web development world it's pretty common to use uuids, and while working in documentation or sample code it has been helpful to generate sample values.
+#+BEGIN_SRC emacs-lisp
+(require 'org-id)
+(defun uuid ()
+  "Inserts a uuid"
+  (interactive)
+  (insert (org-id-uuid)))
+#+END_SRC
 
 * Version Control
 
@@ -468,6 +492,22 @@ Someday, maybe.
 #+END_SRC
 
 * Programming
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.(cs|vb)*html?\\'" . web-mode))
+
+    (defun my-web-mode-hook ()
+      "Hooks for Web Mode."
+      (setq web-mode-enable-auto-closing t)
+      (setq web-mode-enable-auto-quoting t)
+      (setq web-mode-markup-indent-offset 2))
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
   (use-package restclient
     :ensure t)
@@ -498,8 +538,10 @@ Someday, maybe.
 (use-package clojure-mode
   :ensure cider)
 
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "/usr/bin/sbcl")
+(let ((quicklisp-filename "~/quicklisp/slime-helper.el"))
+  (when (file-exists-p quicklisp-filename)
+    (load (expand-file-name quicklisp-filename)))
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
 #+END_SRC
 ** Python
 #+BEGIN_SRC emacs-lisp
@@ -526,27 +568,13 @@ Someday, maybe.
   (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
 
-** Markup
+React!
+
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package handlebars-mode
-  ;;   :ensure t)
-  (use-package web-mode
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.(cs|vb)*html?\\'" . web-mode))
-
-    (defun my-web-mode-hook ()
-      "Hooks for Web Mode."
-      (setq web-mode-enable-auto-closing t)
-      (setq web-mode-enable-auto-quoting t)
-      (setq web-mode-markup-indent-offset 2))
-
-    (add-hook 'web-mode-hook 'my-web-mode-hook))
+  (use-package rjsx-mode
+    :ensure t)
+  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 #+END_SRC
-
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
 
