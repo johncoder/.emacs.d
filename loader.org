@@ -57,10 +57,6 @@ Picked this up from a friend. [[https://www.emacswiki.org/emacs/CustomFile][Cust
 ;;   (setq gnutls-verify-error t)
 ;;   (setq gnutls-trustfiles (list trustfile)))
 #+END_SRC
-
-
-** Laundry List
-Try out [[https://github.com/yuya373/emacs-slack][emacs-slack]].
 * Installing use-package
 ** Setup
 There are several package archives available:
@@ -88,14 +84,6 @@ Each archive will write its files in a separate archive directory.
   (add-to-list 'package-archives melpa t)
   (add-to-list 'package-archives org-elpa t)
   (add-to-list 'package-archives elpa t)
-  ;; (defvar melpa-stable '("melpa-stable" . "https://stable.melpa.org/packages/"))
-  ;; (add-to-list 'package-archives melpa-stable t)
-  ;; (defvar melpa '("melpa" . "https://melpa.org/packages/"))
-  ;; (add-to-list 'package-archives melpa t)
-  ;; (defvar gnu '("gnu" . "http://elpa.gnu.org/packages/"))
-  ;; (add-to-list 'package-archives gnu t)
-  ;; (defvar org-elpa '("org" . "http://orgmode.org/elpa/"))
-  ;; (add-to-list 'package-archives org-elpa t)
 #+END_SRC
 
 Initialize the archive and refresh the contents in case there is no cached archive.
@@ -107,9 +95,9 @@ Initialize the archive and refresh the contents in case there is no cached archi
   ;; reason the melpa-stable one doesn't appear for me, but I assume it
   ;; has to do with Windows? When the melpa-stable item was missing it
   ;; would always try to refresh package contents.
+  ;; (file-exists-p (concat init-dir "elpa/archives/melpa-stable")))
   (unless (and (file-exists-p (concat init-dir "elpa/archives/gnu"))
                (file-exists-p (concat init-dir "elpa/archives/melpa")))
-               ;; (file-exists-p (concat init-dir "elpa/archives/melpa-stable")))
     (package-refresh-contents))
 #+END_SRC
 
@@ -139,9 +127,9 @@ Install extensions if they're missing
 #+BEGIN_SRC emacs-lisp
   (defun init--install-packages ()
     (message "Let's install some packages")
-     (packages-install
-      ;; this is the only entry here because use-package is used later
-      (cons 'use-package melpa)))
+    (packages-install
+     ;; this is the only entry here because use-package is used later
+     (cons 'use-package melpa)))
   (condition-case nil
       (init--install-packages)
     (error
@@ -176,17 +164,8 @@ The default behavior of Emacs is to litter the same directory with temporary fil
         auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
     )
 
-    ;; (setq delete-by-moving-to-trash t
-    ;;       trash-directory "~/.Trash/emacs")
-
     (setq backup-directory-alist `(("." . ,(expand-file-name
                                             (concat init-dir "backups")))))
-#+END_SRC
-
-** Opening Files
-
-#+BEGIN_SRC emacs-lisp
-;; (setq ns-pop-up-frames nil)
 #+END_SRC
 ** Platform Specific
 When using dired on MacOS, you get an error like =ls does not support --dired=. See [[https://stackoverflow.com/questions/25125200/emacs-error-ls-does-not-support-dired][this question on SO]].
@@ -214,30 +193,10 @@ Ditch the lousy bars and obnoxious bell.
 
 #+NAME: credmp-package-installer
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package base16-theme
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'base16-grayscale-dark t))
-  ;;(use-package atom-one-dark-theme
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'atom-one-dark t))
-  ;;(use-package sublime-themes
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'mccarthy t))
-  ;;(use-package github-theme
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'github t))
   (use-package arjen-grey-theme
     :ensure t
     :config
     (load-theme 'arjen-grey t))
-  ;; (use-package eink-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'eink t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
@@ -245,49 +204,9 @@ Ditch the lousy bars and obnoxious bell.
   (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
-** Icons
-
-Screen real estate is precious, so iconography seems worthwhile to try. This package provides icons that can be used in other configurations.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package all-the-icons
-  ;;   :ensure t)
-#+END_SRC
-
-** Mode Line
-
-I really wanted to try and make [[https://github.com/domtronn/all-the-icons.el/wiki/Mode-Line][all-the-icons mode line]] work, but it eludes me. Instead I'm punting and going with [[https://github.com/domtronn/spaceline-all-the-icons.el][spaceline-all-the-icons]].
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package mode-icons
-  ;;   :ensure t
-  ;;   :config
-  ;;   (mode-icons-mode t))
-
-  ;; (use-package spaceline
-  ;;  :ensure t)
-  ;; (use-package spaceline-all-the-icons
-  ;;   :ensure t
-  ;;   :after spaceline
-  ;;   :config (spaceline-all-the-icons-theme))
-#+END_SRC
-
 ** Editor
 #+BEGIN_SRC emacs-lisp
-    ;; (use-package linum
-    ;;   :ensure t
-    ;;   :config ())
-    ;; (add-hook 'find-file-hook (lambda () (linum-mode 1)))
-    (delete-selection-mode)
-
-  ;; (use-package centered-window
-  ;;   :ensure t
-  ;;   :config
-  ;;   (centered-window-mode t))
-  ;; (use-package centered-cursor-mode
-  ;;   :ensure t
-  ;;   :config
-  ;;   (global-centered-cursor-mode t))
+  (delete-selection-mode)
 #+END_SRC
 
 ** Moving Around
@@ -389,9 +308,6 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (global-set-key [remap move-beginning-of-line]
                   'my/smarter-move-beginning-of-line)
 #+END_SRC
-
-** Sounds
-Someday, maybe.
 * Productivity
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -431,7 +347,7 @@ Someday, maybe.
   (setq org-habit-graph-column 80)
   (org-babel-do-load-languages
     'org-babel-load-languages
-    '((dot . t) (python . t) (restclient . t)))
+    '((dot . t) (python . t) (restclient . t) (js . t)))
   (setq org-confirm-babel-evaluate nil)
 
   (use-package elfeed-org
@@ -492,6 +408,32 @@ In the web development world it's pretty common to use uuids, and while working 
 
 * Programming
 #+BEGIN_SRC emacs-lisp
+;; Colorful Markers
+(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-study-face)
+(make-face 'font-lock-important-face)
+(make-face 'font-lock-question-face)
+(make-face 'font-lock-note-face)
+(make-face 'font-lock-see-face)
+(mapc (lambda (mode)
+        (font-lock-add-keywords
+         mode
+         '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+           ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
+           ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+           ("\\<\\(QUESTION\\)" 1 'font-lock-question-face t)
+           ("\\<\\(SEE\\)" 1 'font-lock-see-face t)
+           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+      fixme-modes)
+(modify-face 'font-lock-fixme-face "#D64C2A" nil nil t nil t nil nil)
+(modify-face 'font-lock-study-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-important-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-question-face "#ffa500" nil nil t nil t nil nil)
+(modify-face 'font-lock-see-face "#88C9F0" nil nil t nil t nil nil)
+(modify-face 'font-lock-note-face "#8ABB93" nil nil t nil t nil nil)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
   (use-package web-mode
     :ensure t
     :config
@@ -499,12 +441,9 @@ In the web development world it's pretty common to use uuids, and while working 
     (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.as[cp]x?\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.(cs|vb)*html?\\'" . web-mode))
-
-    (defun my-web-mode-hook ()
-      "Hooks for Web Mode."
-      (setq web-mode-enable-auto-closing t)
-      (setq web-mode-enable-auto-quoting t)
-      (setq web-mode-markup-indent-offset 2))
+    (setq web-mode-enable-auto-closing t)
+    (setq web-mode-enable-auto-quoting t)
+    (setq web-mode-markup-indent-offset 2))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -570,7 +509,12 @@ React!
 #+BEGIN_SRC emacs-lisp
   (use-package rjsx-mode
     :ensure t)
-  (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+  (add-hook 'rjsx-mode-hook
+    (lambda ()
+      (setq indent-tabs-mode nil) ;;Use space instead of tab
+      (setq js-indent-level 2) ;;space width is 2 (default is 4)
+      (setq js2-strict-missing-semi-warning nil)))
+  (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
 #+END_SRC
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
