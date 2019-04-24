@@ -314,6 +314,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
     :ensure org-plus-contrib)
 
   (require 'org-habit)
+  (require 'org-drill)
 
   (define-key global-map "\C-ca" 'org-agenda)
   (define-key global-map "\C-cc" 'org-capture)
@@ -350,19 +351,19 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
     '((dot . t) (python . t) (restclient . t) (js . t)))
   (setq org-confirm-babel-evaluate nil)
 
+  (require 'elfeed)
   (use-package elfeed-org
-    :ensure elfeed)
+    :ensure t)
 
   (use-package elfeed-goodies
-    :ensure elfeed)
+    :ensure t)
 
-  (require 'elfeed)
-  (require 'elfeed-org)
-  (require 'elfeed-goodies)
+  ;; (require 'elfeed-org)
+  ;; (require 'elfeed-goodies)
   (elfeed-org)
   (elfeed-goodies/setup)
-  (setq rmh-elfeed-org-files '("/Users/johnnelson/org/rss.org"))
-  (setf elfeed-db-directory "/Users/johnnelson/org/elfeed-db")
+  (setq rmh-elfeed-org-files '("~/org/rss.org"))
+  (setf elfeed-db-directory "~/org/elfeed-db")
   (setf elfeed-goodies/entry-pane-position 'bottom)
 #+END_SRC
 ** Capture Templates
@@ -456,6 +457,8 @@ In the web development world it's pretty common to use uuids, and while working 
     :config
     (global-set-key (kbd "<f12>") 'dumb-jump-go)
     (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark))
+  (use-package go-mode
+    :ensure t)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
