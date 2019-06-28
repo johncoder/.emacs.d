@@ -540,6 +540,19 @@ Rake
   :ensure t)
 #+END_SRC
 ** JavaScript
+Super annoying, but whenever you see these compiler warnings:
+
+#+BEGIN_QUOTE
+Warning (bytecomp): ‘beginning-of-buffer’ is for interactive use only;
+use ‘(goto-char (point-min))’ instead.
+Warning (bytecomp): ‘replace-string’ is for interactive use only; use
+‘search-forward’ and ‘replace-match’ instead.
+#+END_QUOTE
+
+See [[https://github.com/jsx/jsx-mode.el/pull/15/files][PR to fix these warnings]]
+
+I just went in and made the changes to =jsx-mode.el=.
+
 #+BEGIN_SRC emacs-lisp
   (use-package jsx-mode
     :ensure t)
