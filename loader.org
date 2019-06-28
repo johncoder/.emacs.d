@@ -407,7 +407,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
            ("c" "Clock item"           item  (clock) "  - %i%?")
            ("w" "Work Note"            entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
            ("j" "Append journal entry" entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
-           ("t" "Micro Blog Entry"     plain (file "~/org/micro-blog.org")   "* %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
+           ("t" "Micro Blog Entry"     plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
            ("f" "Flash Card"           entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
           ))
 #+END_SRC
