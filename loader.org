@@ -187,7 +187,8 @@ Ditch the lousy bars and obnoxious bell.
   (setq visible-bell nil)
   (setq column-number-mode t)
   (setq-default cursor-type 'bar)
-  (setq initial-buffer-choice 'elfeed)
+  ; (setq initial-buffer-choice 'elfeed)
+  (add-hook 'after-init-hook 'org-agenda-list)
   (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
@@ -212,11 +213,11 @@ Ditch the lousy bars and obnoxious bell.
 ** Moving Around
 *** Bookmarks
 #+BEGIN_SRC emacs-lisp
-  (use-package bm
-    :ensure t
-    :bind (("C-c =" . bm-toggle)
-           ("C-c [" . bm-previous)
-           ("C-c ]" . bm-next)))
+  ;; (use-package bm
+  ;;   :ensure t
+  ;;   :bind (("C-c =" . bm-toggle)
+  ;;          ("C-c [" . bm-previous)
+  ;;          ("C-c ]" . bm-next)))
 #+END_SRC
 
 *** Ivy/Counsel/Swiper
@@ -433,6 +434,7 @@ In the web development world it's pretty common to use uuids, and while working 
 #+END_SRC
 
 * Programming
+** General
 #+BEGIN_SRC emacs-lisp
 ;; Colorful Markers
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode))
@@ -471,21 +473,31 @@ In the web development world it's pretty common to use uuids, and while working 
     (setq web-mode-enable-auto-quoting t)
     (setq web-mode-markup-indent-offset 2))
 #+END_SRC
-
+** restclient
 #+BEGIN_SRC emacs-lisp
   (use-package restclient
     :ensure t)
   (use-package ob-restclient
     :ensure t)
+#+END_SRC
+** dumb jump
+#+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
     :ensure t
     :config
     (global-set-key (kbd "<f12>") 'dumb-jump-go)
     (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark))
-  (use-package go-mode
-    :ensure t)
 #+END_SRC
 
+** Go
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :ensure t)
+  (use-package flycheck-golangci-lint
+    :ensure t
+    :hook (go-mode . flycheck-golangci-lint-setup))
+#+END_SRC
+** Emacs Lisp
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq c-default-style "bsd"
