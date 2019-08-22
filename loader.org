@@ -369,9 +369,11 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
         org-log-done 'time)
   (add-to-list 'org-modules 'org-habit t)
   (setq org-habit-graph-column 80)
+  (use-package gnuplot
+    :ensure t)
   (org-babel-do-load-languages
     'org-babel-load-languages
-    '((dot . t) (python . t) (restclient . t) (js . t)))
+    '((dot . t) (python . t) (restclient . t) (js . t) (gnuplot . t)))
   (setq org-confirm-babel-evaluate nil)
 
   (use-package elfeed
@@ -404,12 +406,13 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
         '(
-           ("a" "Agenda Item"          entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
-           ("c" "Clock item"           item  (clock) "  - %i%?")
-           ("w" "Work Note"            entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
-           ("j" "Append journal entry" entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
-           ("t" "Micro Blog Entry"     plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
-           ("f" "Flash Card"           entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
+           ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
+           ("c" "Clock item"            item  (clock) "  - %i%?")
+           ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
+           ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
+           ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
+           ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
+           ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
           ))
 #+END_SRC
 
@@ -461,6 +464,27 @@ In the web development world it's pretty common to use uuids, and while working 
 (modify-face 'font-lock-see-face "#88C9F0" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "#8ABB93" nil nil t nil t nil nil)
 #+END_SRC
+
+*Flycheck Mode*
+
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+#+END_SRC
+
+
+*Company Mode*
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t)
+#+END_SRC
+
+#+RESULTS:
+
+*Web Mode*
+
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
     :ensure t
@@ -490,12 +514,29 @@ In the web development world it's pretty common to use uuids, and while working 
 #+END_SRC
 
 ** Go
+Go comes with an emacs package to invoke their [[https://github.com/golang/lint#emacs][linter]]!
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path
+    (concat (getenv "GOPATH")
+            "/src/golang.org/x/lint/misc/emacs"))
+(require 'golint)
+#+END_SRC
+
+Go Mode
+
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
-    :ensure t)
+    :ensure t
+    :init (add-hook 'before-save-hook 'gofmt-before-save))
   (use-package flycheck-golangci-lint
     :ensure t
     :hook (go-mode . flycheck-golangci-lint-setup))
+  (use-package company-go
+    :ensure t
+    :hook (go-mode . (lambda ()
+                       (set (make-local-variable 'company-backends) '(company-go))
+                       (company-mode))))
 #+END_SRC
 ** Emacs Lisp
 #+BEGIN_SRC emacs-lisp
@@ -584,6 +625,19 @@ React!
       (setq js2-strict-missing-semi-warning nil)))
   (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
 #+END_SRC
+
+*Typescript*
+
+TODO(john): Dig in!
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package tide
+  ;;   :ensure t
+  ;;   :after (typescript-mode company flycheck)
+  ;;   :hook ((typescript-mode . tide-setup)
+  ;;          (typescript-mode . tide-hl-identifier-mode)
+  ;;          (before-save . tide-format-before-save)))
+#+END_SRC
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
 
@@ -631,4 +685,5 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "<f5>") 'compile)
   (global-set-key (kbd "C-<f5>") 'next-error)
   (global-set-key (kbd "C-S-<f5>") 'previous-error)
+  (global-set-key (kbd "C-`") 'rgrep)
 #+END_SRC
