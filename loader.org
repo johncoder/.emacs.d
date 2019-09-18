@@ -543,6 +543,12 @@ Go Mode
 
      (add-hook 'before-save-hook 'gofmt-before-save)
 
+     (use-package gotest
+       :ensure t
+       :bind (("C-c , f" . go-test-current-file)
+              ("C-c , t" . go-test-current-test)
+              ("C-c , p" . go-test-current-project)))
+
      ;; SEE(john): https://melpa.org/#/go-guru
      ;; SEE(john): These are the keybindings...
      ;; https://github.com/dominikh/go-mode.el/blob/1bbe1d0cb88564e6c5b74ccd78ab87a8b9998374/go-guru.el#L106-L118
