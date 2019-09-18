@@ -373,7 +373,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
     :ensure t)
   (org-babel-do-load-languages
     'org-babel-load-languages
-    '((dot . t) (python . t) (restclient . t) (js . t) (gnuplot . t)))
+    '((dot . t) (python . t) (restclient . t) (js . t) (gnuplot . t) (shell . t)))
   (setq org-confirm-babel-evaluate nil)
 
   (use-package elfeed
@@ -393,6 +393,10 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (setf elfeed-db-directory "~/org/elfeed-db")
   (setf elfeed-goodies/entry-pane-position 'bottom)
 #+END_SRC
+
+#+RESULTS:
+: bottom
+
 ** Capture Templates
 
 | Placeholder | Description                 |
@@ -478,7 +482,8 @@ In the web development world it's pretty common to use uuids, and while working 
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :ensure t)
+    :ensure t
+    :init (add-hook 'after-init-hook 'global-company-mode))
 #+END_SRC
 
 #+RESULTS:
@@ -510,7 +515,9 @@ In the web development world it's pretty common to use uuids, and while working 
     :ensure t
     :config
     (global-set-key (kbd "<f12>") 'dumb-jump-go)
-    (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark))
+    (global-set-key (kbd "C-=") 'dumb-jump-go)
+    (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark)
+    (global-set-key (kbd "C-+") 'pop-tag-mark))
 #+END_SRC
 
 ** Go
@@ -526,9 +533,28 @@ Go comes with an emacs package to invoke their [[https://github.com/golang/lint#
 Go Mode
 
 #+BEGIN_SRC emacs-lisp
+  (use-package go-guru
+    :ensure t)
+
+  (defun jrn-go-mode-hook ()
+     ;; TODO(john): Check and see if I really want to do this...
+     (if (executable-find "goimports")
+       (setq gofmt-command "goimports"))
+
+     (add-hook 'before-save-hook 'gofmt-before-save)
+
+     ;; SEE(john): https://melpa.org/#/go-guru
+     ;; SEE(john): These are the keybindings...
+     ;; https://github.com/dominikh/go-mode.el/blob/1bbe1d0cb88564e6c5b74ccd78ab87a8b9998374/go-guru.el#L106-L118
+     (go-guru-hl-identifier-mode)
+
+     (local-set-key (kbd "s-.") 'godef-jump)
+     (local-set-key (kbd "s->") 'pop-tag-mark))
+
   (use-package go-mode
     :ensure t
-    :init (add-hook 'before-save-hook 'gofmt-before-save))
+    :hook (go-mode . jrn-go-mode-hook))
+
   (use-package flycheck-golangci-lint
     :ensure t
     :hook (go-mode . flycheck-golangci-lint-setup))
