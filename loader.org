@@ -205,6 +205,14 @@ Ditch the lousy bars and obnoxious bell.
   (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
+Colors in =*compilation*= buffer
+
+#+BEGIN_SRC emacs-lisp
+(when (require 'ansi-color nil t)
+  (defun my-colorize-compilation-buffer ()
+    (ansi-color-apply-on-region compilation-filter-start (point-max)))
+  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+#+END_SRC
 ** Editor
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode)
