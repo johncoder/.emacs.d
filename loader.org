@@ -723,7 +723,10 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "C-<tab>") 'other-window)
   (global-set-key (kbd "C-S-<tab>") 'other-window-prev)
   (global-set-key (kbd "<f5>") 'compile)
+  (global-set-key (kbd "s-i") 'compile)
   (global-set-key (kbd "C-<f5>") 'next-error)
   (global-set-key (kbd "C-S-<f5>") 'previous-error)
+  (global-set-key (kbd "M-n") 'next-error)
+  (global-set-key (kbd "M-p") 'previous-error)
   (global-set-key (kbd "C-`") 'rgrep)
 #+END_SRC
