@@ -216,6 +216,14 @@ Ditch the lousy bars and obnoxious bell.
   (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
+Colors in =*compilation*= buffer
+
+#+BEGIN_SRC emacs-lisp
+(when (require 'ansi-color nil t)
+  (defun my-colorize-compilation-buffer ()
+    (ansi-color-apply-on-region compilation-filter-start (point-max)))
+  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+#+END_SRC
 ** Editor
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode)
@@ -726,7 +734,10 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "C-<tab>") 'other-window)
   (global-set-key (kbd "C-S-<tab>") 'other-window-prev)
   (global-set-key (kbd "<f5>") 'compile)
+  (global-set-key (kbd "s-i") 'compile)
   (global-set-key (kbd "C-<f5>") 'next-error)
   (global-set-key (kbd "C-S-<f5>") 'previous-error)
+  (global-set-key (kbd "M-n") 'next-error)
+  (global-set-key (kbd "M-p") 'previous-error)
   (global-set-key (kbd "C-`") 'rgrep)
 #+END_SRC
