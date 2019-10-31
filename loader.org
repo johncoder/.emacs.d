@@ -141,6 +141,17 @@ Install extensions if they're missing
 * Internals
 This section is about the internal behavior of Emacs.
 
+** Environment
+On Ubuntu I usually launch the app through the M-<Space> launcher
+thingy. Unfortunately it doesn't pick up the env vars I depend on from
+the terminal. This should address that.
+
+#+BEGIN_SRC emacs-lisp
+  (when (eq system-type 'linux)
+    (use-package exec-path-from-shell
+      :ensure t
+      :init (exec-path-from-shell-copy-env "GOPATH")))
+#+END_SRC
 ** Backup
 
 The default behavior of Emacs is to litter the same directory with temporary files. It looks like auto-save is enabled here, so we'll see how long I tolerate that for.
