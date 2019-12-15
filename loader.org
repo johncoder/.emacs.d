@@ -208,10 +208,13 @@ Ditch the lousy bars and obnoxious bell.
 
 #+NAME: credmp-package-installer
 #+BEGIN_SRC emacs-lisp
-  (use-package arjen-grey-theme
+  ;;(use-package arjen-grey-theme
+  ;;  :ensure t
+  ;;  :config
+  ;;  (load-theme 'arjen-grey t))
+  (use-package material-theme
     :ensure t
-    :config
-    (load-theme 'arjen-grey t))
+    :config (load-theme 'material t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
@@ -219,13 +222,33 @@ Ditch the lousy bars and obnoxious bell.
   (set-face-attribute 'default nil :height 160)
 #+END_SRC
 
-Colors in =*compilation*= buffer
-
 #+BEGIN_SRC emacs-lisp
 (when (require 'ansi-color nil t)
   (defun my-colorize-compilation-buffer ()
     (ansi-color-apply-on-region compilation-filter-start (point-max)))
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq compilation-scroll-output 'first-error)
+#+END_SRC
+
+[[https://www.emacswiki.org/emacs/TransparentEmacs][Transparency]] in the emacs client frame is pretty nice to have. I elected not to bind this to keys for simplicity. To enable, run:
+
+=M-x toggle-transparency=
+
+#+BEGIN_SRC emacs-lisp
+(defun toggle-transparency ()
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(85 . 50) '(100 . 100)))))
 #+END_SRC
 ** Editor
 #+BEGIN_SRC emacs-lisp
@@ -692,6 +715,16 @@ TODO(john): Dig in!
   ;;          (typescript-mode . tide-hl-identifier-mode)
   ;;          (before-save . tide-format-before-save)))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flow-minor-mode
+    :ensure t
+    :hook (add-hook 'js2-mode-hook 'flow-minor-enable-automatically))
+#+END_SRC
+
+#+RESULTS:
+| flow-minor-mode |
+
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
 
@@ -725,7 +758,12 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (add-hook 'sql-interactive-mode-hook (lambda ()
                                            (toggle-truncate-lines t)))
 #+END_SRC
-* Keybindings
+** Varnish
+#+BEGIN_SRC emacs-lisp
+(use-package vcl-mode
+  :ensure t)
+#+END_SRC
+* Key bindings
 ** Other Window
 #+BEGIN_SRC emacs-lisp
   (defun other-window-prev ()
