@@ -572,6 +572,9 @@ Go comes with an emacs package to invoke their [[https://github.com/golang/lint#
 (add-to-list 'load-path
     (concat (getenv "GOPATH")
             "/src/golang.org/x/lint/misc/emacs"))
+(add-to-list 'load-path
+    (concat (getenv "HOME")
+            "/go/src/golang.org/x/lint/misc/emacs"))
 (require 'golint)
 #+END_SRC
 
@@ -617,9 +620,7 @@ Go Mode
 #+END_SRC
 ** Emacs Lisp
 #+BEGIN_SRC emacs-lisp
-  (setq-default indent-tabs-mode nil)
   (setq c-default-style "bsd"
-        c-basic-indent 4
         c-basic-offset 4
         tab-width 4
         indent-tabs-mode nil)
@@ -656,6 +657,14 @@ Rake
     '(setq rake-completion-system projectile-completion-system)))
 #+end_src
 ** C/C++
+Make emacs behave for C
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook
+            '(lambda ()
+               (progn (c-set-style "bsd" nil)
+                      (setq c-basic-offset 4))))
+#+END_SRC
 
 ** C#
 
@@ -760,8 +769,8 @@ This was immediately helpful in managing docker containers from within emacs. 10
 #+END_SRC
 ** Varnish
 #+BEGIN_SRC emacs-lisp
-(use-package vcl-mode
-  :ensure t)
+  ;; (use-package vcl-mode
+  ;;   :ensure t)
 #+END_SRC
 * Key bindings
 ** Other Window
