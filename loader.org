@@ -216,8 +216,7 @@ Ditch the lousy bars and obnoxious bell.
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
-      (set-face-attribute 'default nil :font "Inconsolata" :height 140))
-  (set-face-attribute 'default nil :height 160)
+      (set-face-attribute 'default nil :font "JetBrains Mono" :height 140))
   (set-face-attribute 'default nil :height 140)
 #+END_SRC
 
