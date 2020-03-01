@@ -192,6 +192,7 @@ Ditch the lousy bars and obnoxious bell.
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+  (global-hl-line-mode)
 
   (defun my-bell-function ())
   (setq ring-bell-function 'my-bell-function)
@@ -211,12 +212,13 @@ Ditch the lousy bars and obnoxious bell.
   ;;  (load-theme 'arjen-grey t))
   (use-package material-theme
     :ensure t
-    :config (load-theme 'material t))
+    :config (load-theme 'material-light t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
       (set-face-attribute 'default nil :font "Inconsolata" :height 140))
   (set-face-attribute 'default nil :height 160)
+  (set-face-attribute 'default nil :height 140)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -247,6 +249,25 @@ Ditch the lousy bars and obnoxious bell.
                100)
           '(85 . 50) '(100 . 100)))))
 #+END_SRC
+
+Emoji support!
+
+#+BEGIN_SRC emacs-lisp
+(use-package emojify
+  :ensure t
+  :init (global-emojify-mode))
+#+END_SRC
+
+Powerline
+
+#+begin_src emacs-lisp
+(use-package powerline
+  :ensure t
+  :init (powerline-default-theme))
+#+end_src
+
+#+RESULTS:
+
 ** Editor
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode)
@@ -415,8 +436,17 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
     :ensure t)
   (org-babel-do-load-languages
     'org-babel-load-languages
-    '((dot . t) (python . t) (restclient . t) (js . t) (gnuplot . t) (shell . t)))
+    '((dot . t)
+      (python . t)
+      (restclient . t)
+      (js . t)
+      (gnuplot . t)
+      (shell . t)
+      (plantuml . t)))
   (setq org-confirm-babel-evaluate nil)
+
+  (setq org-plantuml-jar-path
+      (expand-file-name "~/Downloads/plantuml.jar"))
 
   (use-package elfeed
     :ensure t)
@@ -450,16 +480,16 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
 | %?          | Cursor ending location      |
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates
-        '(
-           ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
-           ("c" "Clock item"            item  (clock) "  - %i%?")
-           ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
-           ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
-           ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
-           ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
-           ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
-          ))
+(setq org-capture-templates
+  '(
+     ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
+     ("c" "Clock item"            item  (clock) "  - %i%?")
+     ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
+     ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
+     ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
+     ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
+     ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
+        ))
 #+END_SRC
 
 ** Quick Tools
@@ -597,7 +627,8 @@ Go Mode
      (go-guru-hl-identifier-mode)
 
      (local-set-key (kbd "s-.") 'godef-jump)
-     (local-set-key (kbd "s->") 'pop-tag-mark))
+     (local-set-key (kbd "s->") 'pop-tag-mark)
+     (setq tab-width 4))
 
   (use-package go-mode
     :ensure t
@@ -758,6 +789,11 @@ This was immediately helpful in managing docker containers from within emacs. 10
 ** Varnish
 #+BEGIN_SRC emacs-lisp
 (use-package vcl-mode
+  :ensure t)
+#+END_SRC
+** YAML
+#+BEGIN_SRC emacs-lisp
+(use-package yaml-mode
   :ensure t)
 #+END_SRC
 * Key bindings
