@@ -648,6 +648,15 @@ Go Mode
                        (set (make-local-variable 'company-backends) '(company-go))
                        (company-mode))))
 #+END_SRC
+
+Here's an annoying one! Go's module files will open with the mode used
+for the =Modula-2= programming language. I don't see myself using
+that, so seems fitting to hijack this to be something sensible, like
+=fundamental-mode=!
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.mod" . fundamental-mode))
+#+end_src
 ** Emacs Lisp
 #+BEGIN_SRC emacs-lisp
   (setq c-default-style "bsd"
