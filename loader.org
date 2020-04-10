@@ -213,9 +213,12 @@ Ditch the lousy bars and obnoxious bell.
   ;;  :ensure t
   ;;  :config
   ;;  (load-theme 'arjen-grey t))
-  (use-package material-theme
+  ;; (use-package material-theme
+  ;;   :ensure t
+  ;;   :config (load-theme 'material t))
+  (use-package nord-theme
     :ensure t
-    :config (load-theme 'material-light t))
+    :config (load-theme 'nord t))
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
