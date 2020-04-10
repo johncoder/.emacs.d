@@ -430,7 +430,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
                 (shell-command "afplay -v 5 ~/Downloads/level-up.mp3"))))
 
   (defun org-drill-all ()
-    "Begins an org-drill session using all notes"
+    "Begins an org-drill session using all notes."
     (interactive)
     (org-drill
       (directory-files-recursively "~/org/notes/" "\.org$")))
