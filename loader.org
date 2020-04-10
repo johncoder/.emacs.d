@@ -417,6 +417,12 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (add-hook 'org-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'org-display-inline-images)
 
+  (defun johncoder/chmod-after-tangle ()
+    "Some tangled files are intended to be executed."
+    (when (string-suffix-p ".sh" (buffer-file-name))
+      (set-file-modes (buffer-file-name) #o755)))
+  (add-hook 'org-babel-post-tangle-hook 'johncoder/chmod-after-tangle)
+
   (setq org-timer-done-hook nil)
   (when (and (eq system-type 'darwin) (not t)) ; NOTE(john): disable this because that sound isn't available
     (add-hook 'org-timer-done-hook
