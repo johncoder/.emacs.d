@@ -196,6 +196,7 @@ Ditch the lousy bars and obnoxious bell.
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
   (global-hl-line-mode)
+  (global-linum-mode)
 
   (defun my-bell-function ())
   (setq ring-bell-function 'my-bell-function)
@@ -222,7 +223,8 @@ Ditch the lousy bars and obnoxious bell.
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
-      (set-face-attribute 'default nil :font "JetBrains Mono" :height 140))
+      ; (set-face-attribute 'default nil :font "JetBrains Mono" :height 140))
+      (set-face-attribute 'default nil :font "Office Code Pro" :height 140))
   (set-face-attribute 'default nil :height 140)
 #+END_SRC
 
@@ -454,6 +456,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (org-babel-do-load-languages
     'org-babel-load-languages
     '((dot . t)
+      (ruby . t)
       (python . t)
       (restclient . t)
       (js . t)
@@ -501,6 +504,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   '(
      ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
      ("c" "Clock item"            item  (clock) "  - %i%?")
+     ("p" "Pager Duty Log Item"   plain (file+headline "~/org/pagerduty.org" "Log")  "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
      ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
      ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
      ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
@@ -629,26 +633,30 @@ Go Mode
     :ensure t)
 
   (defun jrn-go-mode-hook ()
-     ;; TODO(john): Check and see if I really want to do this...
-     (if (executable-find "goimports")
-       (setq gofmt-command "goimports"))
+    ;; TODO(john): Check and see if I really want to do this...
+    (if (executable-find "goimports")
+        (setq gofmt-command "goimports"))
 
-     (add-hook 'before-save-hook 'gofmt-before-save)
+    (add-hook 'before-save-hook 'gofmt-before-save)
 
-     (use-package gotest
-       :ensure t
-       :bind (("C-c , f" . go-test-current-file)
-              ("C-c , t" . go-test-current-test)
-              ("C-c , p" . go-test-current-project)))
+    (setq imenu-generic-expression
+        '(("type" "^[ \t]*type *\\([^ \t\n\r\f]*[ \t]*\\(struct\\|interface\\)\\)" 1)
+          ("func" "^func *\\(.*\\)" 1)))
 
-     ;; SEE(john): https://melpa.org/#/go-guru
-     ;; SEE(john): These are the keybindings...
-     ;; https://github.com/dominikh/go-mode.el/blob/1bbe1d0cb88564e6c5b74ccd78ab87a8b9998374/go-guru.el#L106-L118
-     (go-guru-hl-identifier-mode)
+    (use-package gotest
+      :ensure t
+      :bind (("C-c , f" . go-test-current-file)
+             ("C-c , t" . go-test-current-test)
+             ("C-c , p" . go-test-current-project)))
 
-     (local-set-key (kbd "s-.") 'godef-jump)
-     (local-set-key (kbd "s->") 'pop-tag-mark)
-     (setq tab-width 4))
+    ;; SEE(john): https://melpa.org/#/go-guru
+    ;; SEE(john): These are the keybindings...
+    ;; https://github.com/dominikh/go-mode.el/blob/1bbe1d0cb88564e6c5b74ccd78ab87a8b9998374/go-guru.el#L106-L118
+    (go-guru-hl-identifier-mode)
+
+    (local-set-key (kbd "s-.") 'godef-jump)
+    (local-set-key (kbd "s->") 'pop-tag-mark)
+    (setq tab-width 4))
 
   (use-package go-mode
     :ensure t
@@ -813,6 +821,8 @@ This was immediately helpful in managing docker containers from within emacs. 10
     :ensure t)
   (use-package docker-tramp
     :ensure t)
+  (use-package kubel
+    :ensure t)
 #+END_SRC
 
 ** SQL
@@ -849,4 +859,5 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "M-n") 'next-error)
   (global-set-key (kbd "M-p") 'previous-error)
   (global-set-key (kbd "C-`") 'rgrep)
+  (global-set-key (kbd "<f1>") 'ff-find-other-file)
 #+END_SRC
