@@ -194,7 +194,8 @@ Ditch the lousy bars and obnoxious bell.
 #+BEGIN_SRC emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
-  (scroll-bar-mode -1)
+  (when (boundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
   (global-hl-line-mode)
   (global-linum-mode)
 
