@@ -854,6 +854,10 @@ This was immediately helpful in managing docker containers from within emacs. 10
     (interactive)
     (other-window) -1)
 #+END_SRC
+
+#+begin_src emacs-lisp
+(winner-mode 1)
+#+end_src
 ** Set
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-<tab>") 'other-window)
