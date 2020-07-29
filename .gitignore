@@ -5,7 +5,7 @@ backups
 recentf
 auto-save-list
 elpa
-loader.el
+README.el
 projectile-bookmarks.eld
 projectile.cache
 .trello
@@ -13,3 +13,8 @@ bookmarks
 url
 tramp
 request
+emojis
+transient
+.lsp-session*
+.org-id-locations
+emacs-auto-custom.el

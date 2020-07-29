@@ -584,6 +584,14 @@ In the web development world it's pretty common to use uuids, and while working 
   (use-package company
     :ensure t
     :init (add-hook 'after-init-hook 'global-company-mode))
+  ;; (setq lsp-keymap-prefix "C-;")
+  ;; (use-package lsp-mode
+  ;;   :ensure t
+  ;;   :hook (
+  ;;          (go-mode . lsp))
+  ;;   :commands lsp)
+  ;; (use-package company-lsp
+  ;;   :ensure t)
 #+END_SRC
 
 #+RESULTS:
@@ -762,10 +770,10 @@ See [[https://github.com/jsx/jsx-mode.el/pull/15/files][PR to fix these warnings
 I just went in and made the changes to =jsx-mode.el=.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package jsx-mode
-    :ensure t)
-  (add-hook 'js-mode-hook (lambda () (setq js-indent-level 2)))
-  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
+;;  (use-package jsx-mode
+;;    :ensure t)
+;;  (add-hook 'js-mode-hook (lambda () (setq js-indent-level 2)))
+;;  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
 
 React!
