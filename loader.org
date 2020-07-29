@@ -275,7 +275,7 @@ characters from using the correct background colors. The bit about
   (use-package powerline
     :ensure t
     :config (when (eq system-type 'darwin)
-              (setq ns-use-srgb-colorspace nil))
+              (setq ns-use-srgb-colorspace 1))
     :init (powerline-default-theme))
 #+end_src
 
