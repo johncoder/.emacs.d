@@ -211,13 +211,6 @@ Ditch the lousy bars and obnoxious bell.
 
 #+NAME: credmp-package-installer
 #+BEGIN_SRC emacs-lisp
-  ;;(use-package arjen-grey-theme
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'arjen-grey t))
-  ;; (use-package material-theme
-  ;;   :ensure t
-  ;;   :config (load-theme 'material t))
   (use-package nord-theme
     :ensure t
     :config (load-theme 'nord t))
@@ -261,9 +254,9 @@ Ditch the lousy bars and obnoxious bell.
 Emoji support!
 
 #+BEGIN_SRC emacs-lisp
-(use-package emojify
-  :ensure t
-  :init (global-emojify-mode))
+  (use-package emojify
+    :ensure t
+    :init (global-emojify-mode))
 #+END_SRC
 
 Powerline
