@@ -78,7 +78,7 @@ Each archive will write its files in a separate archive directory.
 #+BEGIN_SRC emacs-lisp
   (setq package-archives nil)
 
-  (defvar melpa '("melpa" . "http://melpa.milkbox.net/packages/"))
+  (defvar melpa '("melpa" . "http://melpa.org/packages/"))
   (defvar org-elpa '("org" . "http://orgmode.org/elpa/"))
   (defvar elpa '("elpa" . "http://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives melpa t)
