@@ -519,11 +519,29 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
 ** Quick Tools
 In the web development world it's pretty common to use uuids, and while working in documentation or sample code it has been helpful to generate sample values.
 #+BEGIN_SRC emacs-lisp
-(require 'org-id)
-(defun uuid ()
-  "Inserts a uuid"
-  (interactive)
-  (insert (org-id-uuid)))
+  (require 'org-id)
+  (defun uuid ()
+    "Generate and insert a uuid.
+  From http://ergoemacs.org/emacs/elisp_generate_uuid.html"
+    (interactive)
+    (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                                (user-uid)
+                                (emacs-pid)
+                                (system-name)
+                                (user-full-name)
+                                (current-time)
+                                (emacs-uptime)
+                                (garbage-collect)
+                                (buffer-string)
+                                (random)
+                                (recent-keys)))))
+        (insert (format "%s-%s-4%s-%s%s-%s"
+                        (substring myStr 0 8)
+                        (substring myStr 8 12)
+                        (substring myStr 13 16)
+                        (format "%x" (+ 8 (random 4)))
+                        (substring myStr 17 20)
+                        (substring myStr 20 32)))))
 #+END_SRC
 
 * Version Control
