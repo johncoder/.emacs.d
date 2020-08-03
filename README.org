@@ -265,11 +265,14 @@ There's an annoying bug on macOS that prevents the separator
 characters from using the correct background colors. The bit about
 =srgb-colorspace= pertains to fixing that.
 
+Depending on the version of emacs that is installed, I have had to use
+either =nil= or =1= for the value of =ns-use-srgb-colorspace=.
+
 #+begin_src emacs-lisp
   (use-package powerline
     :ensure t
     :config (when (eq system-type 'darwin)
-              (setq ns-use-srgb-colorspace 1))
+              (setq ns-use-srgb-colorspace nil))
     :init (powerline-default-theme))
 #+end_src
 
