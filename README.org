@@ -468,7 +468,7 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
     "Begins an org-drill session using all notes."
     (interactive)
     (org-drill
-      (directory-files-recursively "~/org/notes/" "\.org$")))
+     (directory-files-recursively "~/org/notes/" "\.org$")))
 
   (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
         org-startup-indented t
@@ -487,19 +487,20 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (use-package gnuplot
     :ensure t)
   (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((dot . t)
-      (ruby . t)
-      (python . t)
-      (restclient . t)
-      (js . t)
-      (gnuplot . t)
-      (shell . t)
-      (plantuml . t)))
+   'org-babel-load-languages
+   '((dot . t)
+     (ruby . t)
+     (python . t)
+     (restclient . t)
+     (js . t)
+     (gnuplot . t)
+     (shell . t)
+     (plantuml . t)
+     (sql . t)))
   (setq org-confirm-babel-evaluate nil)
 
   (setq org-plantuml-jar-path
-      (expand-file-name "~/Downloads/plantuml.jar"))
+        (expand-file-name "~/Downloads/plantuml.jar"))
 
   (use-package elfeed
     :ensure t)
@@ -518,10 +519,6 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (setf elfeed-db-directory "~/org/elfeed-db")
   (setf elfeed-goodies/entry-pane-position 'bottom)
 #+END_SRC
-
-#+RESULTS:
-: bottom
-
 ** Capture Templates
 
 | Placeholder | Description                 |
