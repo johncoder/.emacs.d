@@ -452,6 +452,9 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   (add-hook 'org-mode-hook 'flyspell-mode)
   (add-hook 'org-mode-hook 'org-display-inline-images)
 
+  (eval-after-load 'org
+    (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+
   (defun johncoder/chmod-after-tangle ()
     "Some tangled files are intended to be executed."
     (when (string-suffix-p ".sh" (buffer-file-name))
@@ -665,6 +668,16 @@ In the web development world it's pretty common to use uuids, and while working 
   (use-package ob-restclient
     :ensure t)
 #+END_SRC
+** Redis
+#+begin_src emacs-lisp
+  (defun jrn-redis-hook ()
+    (local-set-key (kbd "C-c C-c") 'redis-send-current-line))      ; :hook (redis-cli-mode . jrn-redis-hook))
+
+  (use-package eredis
+    :ensure t)
+  (use-package redis
+    :ensure t)
+#+end_src
 ** dumb jump
 #+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
@@ -773,6 +786,20 @@ that, so seems fitting to hijack this to be something sensible, like
 #+END_SRC
 
 ** Ruby
+#+begin_src emacs-lisp
+  (use-package ruby-mode
+    :ensure t
+    :bind
+    ((("C-c C-c" . ruby-send-region))))
+#+end_src
+
+Ruby Interpreter for repl goodness
+#+begin_src emacs-lisp
+  (use-package inf-ruby
+    :ensure t
+    :init
+    (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode))
+#+end_src
 Rake
 
 #+begin_src emacs-lisp
@@ -845,18 +872,21 @@ React!
 *Typescript*
 
 #+begin_src emacs-lisp
-  ;; (use-package typescript-mode
-  ;;   :ensure t)
-  ;; (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . typescript-mode))
+  (use-package typescript-mode
+    :ensure t
+    :hook ((js2-mode . (lambda () (setq js2-basic-offset 2)))))
+  (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . typescript-mode))
+  (setq typescript-indent-level 2)
 #+end_src
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package tide
-  ;;   :ensure t
-  ;;   :after (typescript-mode company flycheck)
-  ;;   :hook ((typescript-mode . tide-setup)
-  ;;          (typescript-mode . tide-hl-identifier-mode)
-  ;;          (before-save . tide-format-before-save)))
+  (setq js2-basic-offset 2)
+  (use-package tide
+    :ensure t
+    :after (typescript-mode company flycheck)
+    :hook ((typescript-mode . tide-setup)
+           (typescript-mode . tide-hl-identifier-mode)
+           (before-save . tide-format-before-save)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -893,6 +923,15 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (use-package kubel
     :ensure t)
 #+END_SRC
+
+** GraphQL
+
+#+begin_src emacs-lisp
+    (use-package graphql-mode
+      :ensure t)
+    (use-package request
+      :ensure t)
+#+end_src
 
 ** SQL
 
