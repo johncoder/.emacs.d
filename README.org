@@ -588,7 +588,7 @@ In the web development world it's pretty common to use uuids, and while working 
 ** General
 #+BEGIN_SRC emacs-lisp
   ;; Colorful Markers
-  (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode))
+  (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode typescript-mode))
   (make-face 'font-lock-fixme-face)
   (make-face 'font-lock-study-face)
   (make-face 'font-lock-important-face)
@@ -884,6 +884,7 @@ React!
   (use-package tide
     :ensure t
     :after (typescript-mode company flycheck)
+    :bind (("s-." . tide-fix))
     :hook ((typescript-mode . tide-setup)
            (typescript-mode . tide-hl-identifier-mode)
            (before-save . tide-format-before-save)))
