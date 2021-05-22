@@ -216,18 +216,18 @@ Ditch the lousy bars and obnoxious bell.
   (put 'narrow-to-region 'disabled nil)
 #+END_SRC
 
-#+NAME: credmp-package-installer
-#+BEGIN_SRC emacs-lisp
-  ;;(use-package arjen-grey-theme
-  ;;  :ensure t
-  ;;  :config
-  ;;  (load-theme 'arjen-grey t))
-  ;; (use-package material-theme
-  ;;   :ensure t
-  ;;   :config (load-theme 'material t))
+Theme
+
+#+begin_src emacs-lisp
   (use-package nord-theme
     :ensure t
     :config (load-theme 'nord t))
+#+end_src
+
+Font
+
+#+NAME: credmp-package-installer
+#+BEGIN_SRC emacs-lisp
   (if (eq system-type 'windows-nt)
       (set-face-attribute 'default nil :font "Consolas" :height 140))
   (if (eq system-type 'darwin)
@@ -236,6 +236,8 @@ Ditch the lousy bars and obnoxious bell.
   (set-face-attribute 'default nil :height 140)
 #+END_SRC
 
+Colorful compilation buffer
+
 #+BEGIN_SRC emacs-lisp
 (when (require 'ansi-color nil t)
   (defun my-colorize-compilation-buffer ()
@@ -243,9 +245,27 @@ Ditch the lousy bars and obnoxious bell.
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 #+END_SRC
 
+Scroll to the first error in the compilation buffer
+
 #+BEGIN_SRC emacs-lisp
 (setq compilation-scroll-output 'first-error)
 #+END_SRC
+
+Center the buffer!
+
+#+begin_src emacs-lisp
+  (use-package centered-window
+    :ensure t)
+#+end_src
+
+Beacon
+#+begin_src emacs-lisp
+  (use-package beacon
+    :ensure t
+    :init
+    (setq beacon-blink-when-point-moves 1)
+    (beacon-mode 1))
+#+end_src
 
 [[https://www.emacswiki.org/emacs/TransparentEmacs][Transparency]] in the emacs client frame is pretty nice to have. I elected not to bind this to keys for simplicity. To enable, run:
 
@@ -268,9 +288,9 @@ Ditch the lousy bars and obnoxious bell.
 Emoji support!
 
 #+BEGIN_SRC emacs-lisp
-(use-package emojify
-  :ensure t
-  :init (global-emojify-mode))
+  (use-package emojify
+    :ensure t
+    :init (global-emojify-mode))
 #+END_SRC
 
 Powerline
@@ -279,7 +299,11 @@ There's an annoying bug on macOS that prevents the separator
 characters from using the correct background colors. The bit about
 =srgb-colorspace= pertains to fixing that.
 
+Depending on the version of emacs that is installed, I have had to use
+either =nil= or =1= for the value of =ns-use-srgb-colorspace=.
+
 #+begin_src emacs-lisp
+  (setq powerline-image-apple-rgb t)
   (use-package powerline
     :ensure t
     :config (when (eq system-type 'darwin)
@@ -291,7 +315,7 @@ characters from using the correct background colors. The bit about
 
 ** Editor
 #+BEGIN_SRC emacs-lisp
-  (delete-selection-mode)
+  (delete-selection-mode 1)
 #+END_SRC
 
 ** Moving Around
@@ -426,6 +450,49 @@ Then, all the usual stuff...
         :ensure org-plus-contrib)
 
   (require 'org-habit)
+  (defun org-drill-all ()
+    "Begins an org-drill session using all notes."
+    (interactive)
+    (org-drill
+     (directory-files-recursively "~/org/notes/" "\.org$")))
+
+  (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
+        org-startup-indented t
+        org-agenda-span 'day
+        ;; org-log-into-drawer t
+        org-clock-idle-time 10
+        org-return-follows-link t
+        org-special-ctrl-a/e t
+        org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts t
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-drill-learn-fraction 0.3
+        org-log-done 'time)
+  (add-to-list 'org-modules 'org-habit t)
+  (setq org-habit-graph-column 80)
+  (use-package gnuplot
+    :ensure t)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot . t)
+     (ruby . t)
+     (python . t)
+     (restclient . t)
+     (js . t)
+     (gnuplot . t)
+     (shell . t)
+     (plantuml . t)
+     (sql . t)))
+  (setq org-confirm-babel-evaluate nil)
+
+  (setq org-plantuml-jar-path
+        (expand-file-name "~/Downloads/plantuml.jar"))
+
+  (use-package elfeed
+    :ensure t)
+  (require 'elfeed)
+  (use-package elfeed-org
+    :ensure t)
 
   ;; (require 'org-drill)
   (use-package org-drill
@@ -517,10 +584,6 @@ Then, all the usual stuff...
         :hook (after-init . org-roam-mode)
         :config (setq org-roam-directory "~/org/roam"))
 #+END_SRC
-
-#+RESULTS:
-: bottom
-
 ** Capture Templates
 
 | Placeholder | Description                 |
@@ -548,11 +611,29 @@ Then, all the usual stuff...
 ** Quick Tools
 In the web development world it's pretty common to use uuids, and while working in documentation or sample code it has been helpful to generate sample values.
 #+BEGIN_SRC emacs-lisp
-(require 'org-id)
-(defun uuid ()
-  "Inserts a uuid"
-  (interactive)
-  (insert (org-id-uuid)))
+  (require 'org-id) ; I don't think I need this
+  (defun uuid ()
+    "Generate and insert a uuid.
+  From http://ergoemacs.org/emacs/elisp_generate_uuid.html"
+    (interactive)
+    (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                                (user-uid)
+                                (emacs-pid)
+                                (system-name)
+                                (user-full-name)
+                                (current-time)
+                                (emacs-uptime)
+                                (garbage-collect)
+                                (buffer-string)
+                                (random)
+                                (recent-keys)))))
+        (insert (format "%s-%s-4%s-%s%s-%s"
+                        (substring myStr 0 8)
+                        (substring myStr 8 12)
+                        (substring myStr 13 16)
+                        (format "%x" (+ 8 (random 4)))
+                        (substring myStr 17 20)
+                        (substring myStr 20 32)))))
 #+END_SRC
 
 * Version Control
@@ -576,30 +657,30 @@ Nix
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-;; Colorful Markers
-(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode))
-(make-face 'font-lock-fixme-face)
-(make-face 'font-lock-study-face)
-(make-face 'font-lock-important-face)
-(make-face 'font-lock-question-face)
-(make-face 'font-lock-note-face)
-(make-face 'font-lock-see-face)
-(mapc (lambda (mode)
-        (font-lock-add-keywords
-         mode
-         '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-           ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
-           ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
-           ("\\<\\(QUESTION\\)" 1 'font-lock-question-face t)
-           ("\\<\\(SEE\\)" 1 'font-lock-see-face t)
-           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
-      fixme-modes)
-(modify-face 'font-lock-fixme-face "#D64C2A" nil nil t nil t nil nil)
-(modify-face 'font-lock-study-face "Yellow" nil nil t nil t nil nil)
-(modify-face 'font-lock-important-face "Yellow" nil nil t nil t nil nil)
-(modify-face 'font-lock-question-face "#ffa500" nil nil t nil t nil nil)
-(modify-face 'font-lock-see-face "#88C9F0" nil nil t nil t nil nil)
-(modify-face 'font-lock-note-face "#8ABB93" nil nil t nil t nil nil)
+  ;; Colorful Markers
+  (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode typescript-mode))
+  (make-face 'font-lock-fixme-face)
+  (make-face 'font-lock-study-face)
+  (make-face 'font-lock-important-face)
+  (make-face 'font-lock-question-face)
+  (make-face 'font-lock-note-face)
+  (make-face 'font-lock-see-face)
+  (mapc (lambda (mode)
+          (font-lock-add-keywords
+           mode
+           '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+             ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
+             ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+             ("\\<\\(QUESTION\\)" 1 'font-lock-question-face t)
+             ("\\<\\(SEE\\)" 1 'font-lock-see-face t)
+             ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+        fixme-modes)
+  (modify-face 'font-lock-fixme-face "#BF616A" nil nil t nil t nil nil)
+  (modify-face 'font-lock-study-face "#8FBCBB" nil nil t nil t nil nil)
+  (modify-face 'font-lock-important-face "#EBCB8B" nil nil t nil t nil nil)
+  (modify-face 'font-lock-question-face "#D08770" nil nil t nil t nil nil)
+  (modify-face 'font-lock-see-face "#5E81AC" nil nil t nil t nil nil)
+  (modify-face 'font-lock-note-face "#B48EAD" nil nil t nil t nil nil)
 #+END_SRC
 
 *Flycheck Mode*
@@ -614,14 +695,21 @@ Nix
 *Company Mode*
 
 #+BEGIN_SRC emacs-lisp
+  (defvar +lsp-company-backends 'company-capf)
   (use-package company
     :ensure t
     :init (add-hook 'after-init-hook 'global-company-mode))
-  (when (eq system-type 'gnu/linux)
-    (setq lsp-keymap-prefix "C-;"))
+
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-completion-provider :capf)
+
+  ;; TODO(john): if s-l doesn't work out, it can be changed
+  ;; (setq lsp-keymap-prefix "C-;")
   (use-package lsp-mode
     :ensure t
-    :hook ((go-mode . lsp))
+    :hook ((go-mode . lsp)
+           (ruby-mode . lsp))
     :commands lsp)
   (use-package company-lsp
     :ensure t)
@@ -650,6 +738,16 @@ Nix
   (use-package ob-restclient
     :ensure t)
 #+END_SRC
+** Redis
+#+begin_src emacs-lisp
+  (defun jrn-redis-hook ()
+    (local-set-key (kbd "C-c C-c") 'redis-send-current-line))      ; :hook (redis-cli-mode . jrn-redis-hook))
+
+  (use-package eredis
+    :ensure t)
+  (use-package redis
+    :ensure t)
+#+end_src
 ** dumb jump
 #+BEGIN_SRC emacs-lisp
   (use-package dumb-jump
@@ -657,7 +755,7 @@ Nix
     :config
     (global-set-key (kbd "<f12>") 'dumb-jump-go)
     (global-set-key (kbd "C-=") 'dumb-jump-go)
-    (global-set-key (kbd "C-S-<f12>") 'pop-tag-mark)
+    (global-set-key (kbd "C-<f12>") 'pop-tag-mark)
     (global-set-key (kbd "C-+") 'pop-tag-mark))
 #+END_SRC
 
@@ -688,8 +786,8 @@ Go Mode
     (add-hook 'before-save-hook 'gofmt-before-save)
 
     (setq imenu-generic-expression
-        '(("type" "^[ \t]*type *\\([^ \t\n\r\f]*[ \t]*\\(struct\\|interface\\)\\)" 1)
-          ("func" "^func *\\(.*\\)" 1)))
+          '(("type" "^[ \t]*type *\\([^ \t\n\r\f]*[ \t]*\\(struct\\|interface\\)\\)" 1)
+            ("func" "^func *\\(.*\\)" 1)))
 
     (use-package gotest
       :ensure t
@@ -704,7 +802,8 @@ Go Mode
 
     (local-set-key (kbd "s-.") 'godef-jump)
     (local-set-key (kbd "s->") 'pop-tag-mark)
-    (setq tab-width 4))
+    (setq tab-width 4
+          go-tab-width 4))
 
   (use-package go-mode
     :ensure t
@@ -757,6 +856,20 @@ that, so seems fitting to hijack this to be something sensible, like
 #+END_SRC
 
 ** Ruby
+#+begin_src emacs-lisp
+  (use-package ruby-mode
+    :ensure t
+    :bind
+    ((("C-c C-c" . ruby-send-region))))
+#+end_src
+
+Ruby Interpreter for repl goodness
+#+begin_src emacs-lisp
+  (use-package inf-ruby
+    :ensure t
+    :init
+    (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode))
+#+end_src
 Rake
 
 #+begin_src emacs-lisp
@@ -809,30 +922,42 @@ I just went in and made the changes to =jsx-mode.el=.
 ;;  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
 
+#+begin_src emacs-lisp
+  (setq js-indent-level 2)
+#+end_src
+
 React!
 
 #+BEGIN_SRC emacs-lisp
-  (use-package rjsx-mode
-    :ensure t)
-  (add-hook 'rjsx-mode-hook
-    (lambda ()
-      (setq indent-tabs-mode nil) ;;Use space instead of tab
-      (setq js-indent-level 2) ;;space width is 2 (default is 4)
-      (setq js2-strict-missing-semi-warning nil)))
-  (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . rjsx-mode))
+  ;; (use-package rjsx-mode
+  ;;   :ensure t)
+  ;; (add-hook 'rjsx-mode-hook
+  ;;   (lambda ()
+  ;;     (setq indent-tabs-mode nil) ;;Use space instead of tab
+  ;;     (setq js-indent-level 2) ;;space width is 2 (default is 4)
+  ;;     (setq js2-strict-missing-semi-warning nil)))
+  ;; (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . rjsx-mode))
 #+END_SRC
 
 *Typescript*
 
-TODO(john): Dig in!
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :ensure t
+    :hook ((js2-mode . (lambda () (setq js2-basic-offset 2)))))
+  (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . typescript-mode))
+  (setq typescript-indent-level 2)
+#+end_src
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package tide
-  ;;   :ensure t
-  ;;   :after (typescript-mode company flycheck)
-  ;;   :hook ((typescript-mode . tide-setup)
-  ;;          (typescript-mode . tide-hl-identifier-mode)
-  ;;          (before-save . tide-format-before-save)))
+  (setq js2-basic-offset 2)
+  (use-package tide
+    :ensure t
+    :after (typescript-mode company flycheck)
+    :bind (("s-." . tide-fix))
+    :hook ((typescript-mode . tide-setup)
+           (typescript-mode . tide-hl-identifier-mode)
+           (before-save . tide-format-before-save)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -840,9 +965,6 @@ TODO(john): Dig in!
     :ensure t
     :hook (add-hook 'js2-mode-hook 'flow-minor-enable-automatically))
 #+END_SRC
-
-#+RESULTS:
-| flow-minor-mode |
 
 ** PostgreSQL
 In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
@@ -873,6 +995,15 @@ This was immediately helpful in managing docker containers from within emacs. 10
     :ensure t)
 #+END_SRC
 
+** GraphQL
+
+#+begin_src emacs-lisp
+    (use-package graphql-mode
+      :ensure t)
+    (use-package request
+      :ensure t)
+#+end_src
+
 ** SQL
 
 #+BEGIN_SRC emacs-lisp
@@ -889,6 +1020,11 @@ This was immediately helpful in managing docker containers from within emacs. 10
 (use-package yaml-mode
   :ensure t)
 #+END_SRC
+** Terraform
+#+begin_src emacs-lisp
+  (use-package terraform-mode
+    :ensure t)
+#+end_src
 * Key bindings
 ** Other Window
 #+BEGIN_SRC emacs-lisp
@@ -910,6 +1046,9 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "C-S-<f5>") 'previous-error)
   (global-set-key (kbd "M-n") 'next-error)
   (global-set-key (kbd "M-p") 'previous-error)
+  (global-set-key (kbd "M-S-n") 'next-error)
+  (global-set-key (kbd "M-S-p") 'previous-error)
   (global-set-key (kbd "C-`") 'rgrep)
   (global-set-key (kbd "<f1>") 'ff-find-other-file)
+  (global-set-key (kbd "<f8>") 'centered-window-mode)
 #+END_SRC
