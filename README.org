@@ -37,8 +37,7 @@ Picked this up from a friend. [[https://www.emacswiki.org/emacs/CustomFile][Cust
 ** A secure Emacs Environment
 
 #+BEGIN_SRC emacs-lisp
-
-;; (require 'cl)
+(require 'cl)
 ;; (setq tls-checktrust t)
 
 ;; (setq python (or (executable-find "py.exe")
@@ -78,7 +77,7 @@ Each archive will write its files in a separate archive directory.
 #+BEGIN_SRC emacs-lisp
   (setq package-archives nil)
 
-  (defvar melpa '("melpa" . "http://melpa.milkbox.net/packages/"))
+  (defvar melpa '("melpa" . "http://melpa.org/packages/"))
   (defvar org-elpa '("org" . "http://orgmode.org/elpa/"))
   (defvar elpa '("elpa" . "http://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives melpa t)
@@ -147,7 +146,7 @@ thingy. Unfortunately it doesn't pick up the env vars I depend on from
 the terminal. This should address that.
 
 #+BEGIN_SRC emacs-lisp
-  (when (eq system-type 'linux)
+  (when (or (eq system-type 'gnu/linux) (eq system-type 'linux))
     (use-package exec-path-from-shell
       :ensure t
       :init (progn
@@ -181,6 +180,14 @@ The default behavior of Emacs is to litter the same directory with temporary fil
     (setq backup-directory-alist `(("." . ,(expand-file-name
                                             (concat init-dir "backups")))))
 #+END_SRC
+
+Emacs uses lockfiles, but doesn't provide any way to customize their usage, as with =backup-directory-alist=. Disabling it, for now.
+
+#+begin_src emacs-lisp
+  (when (or (eq system-type 'linux)
+            (eq system-type 'gnu/linux))
+    (setq create-lockfiles nil))
+#+end_src
 ** Platform Specific
 When using dired on MacOS, you get an error like =ls does not support --dired=. See [[https://stackoverflow.com/questions/25125200/emacs-error-ls-does-not-support-dired][this question on SO]].
 #+BEGIN_SRC emacs-lisp
@@ -405,92 +412,110 @@ of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][
   :ensure t)
 #+END_SRC
 ** Org
+Lately I've been having trouble getting org stuff to compile? I found [[https://emacs.stackexchange.com/a/58672][this answer]] on emacs.stackexchange.com
+
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib)
+(add-to-list 'load-path "~/.emacs.d/elpa/org*")  
+(setq load-prefer-newer t)
+#+END_SRC
+
+Then, all the usual stuff...
+
+#+BEGIN_SRC emacs-lisp
+      (use-package org
+        :ensure org-plus-contrib)
 
   (require 'org-habit)
-  (require 'org-drill)
 
-  ;; NOTE(john): Because template expansions are borked?
-  ;; SEE: https://github.com/syl20bnr/spacemacs/issues/11798
-  (require 'org-tempo)
-
-  (define-key global-map "\C-ca" 'org-agenda)
-  (define-key global-map "\C-cc" 'org-capture)
-  (define-key global-map "\C-cl" 'org-store-link)
-
-  (setq org-agenda-files (list "~/org"))
-
-  (add-hook 'org-mode-hook 'visual-line-mode)
-  (add-hook 'org-mode-hook 'flyspell-mode)
-  (add-hook 'org-mode-hook 'org-display-inline-images)
-
-  (defun johncoder/chmod-after-tangle ()
-    "Some tangled files are intended to be executed."
-    (when (string-suffix-p ".sh" (buffer-file-name))
-      (set-file-modes (buffer-file-name) #o755)))
-  (add-hook 'org-babel-post-tangle-hook 'johncoder/chmod-after-tangle)
-
-  (setq org-timer-done-hook nil)
-  (when (and (eq system-type 'darwin) (not t)) ; NOTE(john): disable this because that sound isn't available
-    (add-hook 'org-timer-done-hook
-              (lambda ()
-                (shell-command "afplay -v 5 ~/Downloads/level-up.mp3"))))
-
-  (defun org-drill-all ()
-    "Begins an org-drill session using all notes."
-    (interactive)
-    (org-drill
-      (directory-files-recursively "~/org/notes/" "\.org$")))
-
-  (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
-        org-startup-indented t
-        org-agenda-span 'day
-        ;; org-log-into-drawer t
-        org-clock-idle-time 10
-        org-return-follows-link t
-        org-special-ctrl-a/e t
-        org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts t
-        org-agenda-skip-scheduled-if-deadline-is-shown t
-        org-drill-learn-fraction 0.3
-        org-log-done 'time)
-  (add-to-list 'org-modules 'org-habit t)
-  (setq org-habit-graph-column 80)
-  (use-package gnuplot
-    :ensure t)
-  (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((dot . t)
-      (ruby . t)
-      (python . t)
-      (restclient . t)
-      (js . t)
-      (gnuplot . t)
-      (shell . t)
-      (plantuml . t)))
-  (setq org-confirm-babel-evaluate nil)
-
-  (setq org-plantuml-jar-path
-      (expand-file-name "~/Downloads/plantuml.jar"))
-
-  (use-package elfeed
-    :ensure t)
-  (require 'elfeed)
-  (use-package elfeed-org
+  ;; (require 'org-drill)
+  (use-package org-drill
     :ensure t)
 
-  (use-package elfeed-goodies
-    :ensure t)
+      ;; NOTE(john): Because template expansions are borked?
+      ;; SEE: https://github.com/syl20bnr/spacemacs/issues/11798
+      (require 'org-tempo)
 
-  ;; (require 'elfeed-org)
-  ;; (require 'elfeed-goodies)
-  (elfeed-org)
-  (elfeed-goodies/setup)
-  (setq rmh-elfeed-org-files '("~/org/rss.org"))
-  (setf elfeed-db-directory "~/org/elfeed-db")
-  (setf elfeed-goodies/entry-pane-position 'bottom)
+      (define-key global-map "\C-ca" 'org-agenda)
+      (define-key global-map "\C-cc" 'org-capture)
+      (define-key global-map "\C-cl" 'org-store-link)
+
+      (setq org-agenda-files (list "~/org"))
+
+      (add-hook 'org-mode-hook 'visual-line-mode)
+      (add-hook 'org-mode-hook 'flyspell-mode)
+      (add-hook 'org-mode-hook 'org-display-inline-images)
+
+      (defun johncoder/chmod-after-tangle ()
+        "Some tangled files are intended to be executed."
+        (when (string-suffix-p ".sh" (buffer-file-name))
+          (set-file-modes (buffer-file-name) #o755)))
+      (add-hook 'org-babel-post-tangle-hook 'johncoder/chmod-after-tangle)
+
+      (setq org-timer-done-hook nil)
+      (when (and (eq system-type 'darwin) (not t)) ; NOTE(john): disable this because that sound isn't available
+        (add-hook 'org-timer-done-hook
+                  (lambda ()
+                    (shell-command "afplay -v 5 ~/Downloads/level-up.mp3"))))
+
+      (defun org-drill-all ()
+        "Begins an org-drill session using all notes."
+        (interactive)
+        (org-drill
+          (directory-files-recursively "~/org/notes/" "\.org$")))
+
+      (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
+            org-startup-indented t
+            org-agenda-span 'day
+            ;; org-log-into-drawer t
+            org-clock-idle-time 10
+            org-return-follows-link t
+            org-special-ctrl-a/e t
+            org-pretty-entities t
+            org-pretty-entities-include-sub-superscripts t
+            org-agenda-skip-scheduled-if-deadline-is-shown t
+            org-drill-learn-fraction 0.3
+            org-log-done 'time)
+      (add-to-list 'org-modules 'org-habit t)
+      (setq org-habit-graph-column 80)
+      (use-package gnuplot
+        :ensure t)
+      (org-babel-do-load-languages
+        'org-babel-load-languages
+        '((dot . t)
+          (lisp . t)
+          (ruby . t)
+          (python . t)
+          (restclient . t)
+          (js . t)
+          (gnuplot . t)
+          (shell . t)
+          (plantuml . t)))
+      (setq org-confirm-babel-evaluate nil)
+
+      (setq org-plantuml-jar-path
+          (expand-file-name "~/Downloads/plantuml.jar"))
+
+      (use-package elfeed
+        :ensure t)
+      (require 'elfeed)
+      (use-package elfeed-org
+        :ensure t)
+
+      (use-package elfeed-goodies
+        :ensure t)
+
+      ;; (require 'elfeed-org)
+      ;; (require 'elfeed-goodies)
+      (elfeed-org)
+      (elfeed-goodies/setup)
+      (setq rmh-elfeed-org-files '("~/org/rss.org"))
+      (setf elfeed-db-directory "~/org/elfeed-db")
+      (setf elfeed-goodies/entry-pane-position 'bottom)
+
+      (use-package org-roam
+        :ensure t
+        :hook (after-init . org-roam-mode)
+        :config (setq org-roam-directory "~/org/roam"))
 #+END_SRC
 
 #+RESULTS:
@@ -542,6 +567,14 @@ In the web development world it's pretty common to use uuids, and while working 
 
 * Programming
 ** General
+Nix
+
+#+BEGIN_SRC emacs-lisp
+  (use-package nix-mode
+    :ensure t
+    :mode "\\.nix\\'")
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
 ;; Colorful Markers
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode))
@@ -584,14 +617,14 @@ In the web development world it's pretty common to use uuids, and while working 
   (use-package company
     :ensure t
     :init (add-hook 'after-init-hook 'global-company-mode))
-  ;; (setq lsp-keymap-prefix "C-;")
-  ;; (use-package lsp-mode
-  ;;   :ensure t
-  ;;   :hook (
-  ;;          (go-mode . lsp))
-  ;;   :commands lsp)
-  ;; (use-package company-lsp
-  ;;   :ensure t)
+  (when (eq system-type 'gnu/linux)
+    (setq lsp-keymap-prefix "C-;"))
+  (use-package lsp-mode
+    :ensure t
+    :hook ((go-mode . lsp))
+    :commands lsp)
+  (use-package company-lsp
+    :ensure t)
 #+END_SRC
 
 #+RESULTS:
