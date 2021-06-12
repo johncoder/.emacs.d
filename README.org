@@ -247,6 +247,23 @@ The =org-plus-contrib= package is essential.
   (require 'org-tempo)
 #+end_src
 
+Settings
+
+#+begin_src emacs-lisp
+  (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
+        org-startup-indented t
+        org-agenda-span 'day
+        ;; org-log-into-drawer t
+        org-clock-idle-time 10
+        org-return-follows-link t
+        org-special-ctrl-a/e t
+        org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts t
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-drill-learn-fraction 0.3
+        org-log-done 'time)
+#+end_src
+
 Org keybindings
 
 #+begin_src emacs-lisp
@@ -260,6 +277,33 @@ Ensure that org behaves more naturally:
 #+begin_src emacs-lisp
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
+#+end_src
+
+*** Babel
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((dot . t)
+     (ruby . t)
+     (python . t)
+     (restclient . t)
+     (js . t)
+     (gnuplot . t)
+     (shell . t)
+     (plantuml . t)
+     (sql . t)))
+  (setq org-confirm-babel-evaluate nil)
+#+end_src
+
+For making tangled shell files executable:
+
+#+begin_src emacs-lisp
+   (defun johncoder/chmod-after-tangle ()
+        "Some tangled files are intended to be executed."
+        (when (string-suffix-p ".sh" (buffer-file-name))
+          (set-file-modes (buffer-file-name) #o755)))
+      (add-hook 'org-babel-post-tangle-hook 'johncoder/chmod-after-tangle)
+  
 #+end_src
 
 *** Capture Templates
@@ -515,6 +559,8 @@ Tide provides all the nice features for TypeScript in Emacs
 	   (typescript-mode . tide-hl-identifier-mode)
 	   (before-save . tide-format-before-save)))
 #+end_src
+** Go
+TODO
 ** Ruby
 #+begin_src emacs-lisp
   (use-package ruby-mode
