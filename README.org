@@ -280,6 +280,9 @@ Ensure that org behaves more naturally:
 #+end_src
 
 *** Babel
+
+Look into improving load time by defering the call to =org-babel-do-load-languages=. See [[https://blog.d46.us/advanced-emacs-startup/#org142995b][this]].
+    
 #+begin_src emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
