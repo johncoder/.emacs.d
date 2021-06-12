@@ -1,164 +1,40 @@
-#+TITLE: My GNU Emacs configuration
-#+STARTUP: indent
-#+OPTIONS: H:5 num:nil tags:nil toc:nil timestamps:t
-#+LAYOUT: post
-#+DESCRIPTION: Loading emacs configuration using org-babel, based on [[https://gitlab.com/buildfunthings/emacs-config/blob/master/loader.org][buildfunthings]]
-#+TAGS: emacs
-#+CATEGORIES: editing
+#+TITLE: Emacs Configuration
+#+OPTIONS: toc:nil
 
-* Introduction
+* General
+** Fundamental Tweaks
 
-This file is based on [[https://gitlab.com/buildfunthings/emacs-config/blob/master/loader.org][buildfunthings]] emacs config.
+I prefer to remove most of the GUI components at startup.
+   
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (when (boundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-  (setq user-full-name "John Nelson")
-  (setq user-mail-address "jnelson@johncoder.com")
-  (setq org-src-fontify-natively t)
-  (setq org-src-tab-acts-natively t)
+Then, I like to have some more modern looking details.
 
-  (defvar johncoder/tweaking t)
+#+begin_src emacs-lisp
+  (setq-default cursor-type 'bar)
+  (global-hl-line-mode)
+  (global-linum-mode)
+  (setq column-number-mode t)
+  (put 'narrow-to-region 'disabled nil)
+#+end_src
 
-  (defun johncoder/reload ()
-    (interactive)
-    (load-file "~/.emacs.d/init.el"))
+Customization can complicate the config files, so it is useful to isolate where Emacs writes customizations.
 
-  (when johncoder/tweaking
-    (global-set-key (kbd "C-|") 'johncoder/reload))
-#+END_SRC
+#+begin_src emacs-lisp
+  (setf custom-file "~/.emacs.d/emacs-auto-custom.el")
+  (load custom-file t)
+#+end_src
 
-** Hiding Customization
+** Internals
+*** Backup
+I want Emacs backup behavior to stay out of my way.
 
-Picked this up from a friend. [[https://www.emacswiki.org/emacs/CustomFile][Custom File]]. Change the location that Emacs will write out customizations to. The advice is to never modify it by hand.
-
-#+BEGIN_SRC emacs-lisp
-(setf custom-file "~/.emacs.d/emacs-auto-custom.el")
-(load custom-file t)
-#+END_SRC
-** A secure Emacs Environment
-
-#+BEGIN_SRC emacs-lisp
-(require 'cl)
-;; (setq tls-checktrust t)
-
-;; (setq python (or (executable-find "py.exe")
-;;                  (executable-find "python")))
-
-;; (let ((trustfile
-;;       (replace-regexp-in-string
-;;         "\\\\" "/"
-;;         (replace-regexp-in-string
-;;          "\n" ""
-;;          (shell-command-to-string (concat python " -m certifi"))))))
-;;   (setq tls-program
-;;         (list
-;;          (format "gnutls-cli%s --x509cafile %s -p %%p %%h"
-;;                  (if (eq window-system 'w32) ".exe" "") trustfile)))
-;;   (setq gnutls-verify-error t)
-;;   (setq gnutls-trustfiles (list trustfile)))
-#+END_SRC
-* Installing use-package
-** Setup
-There are several package archives available:
-- GNU
-- Marmalade
-- Melpa
-
-Each archive will write its files in a separate archive directory.
-
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-
-  (when (eq system-type 'windows-nt)
-    (setenv "PATH" (concat "E:/msys64/usr/bin;" (getenv "PATH")))
-    (push "E:/msys64/usr/bin;" exec-path))
-#+END_SRC
-
-#+NAME: credmp-package-infrastructure
-#+BEGIN_SRC emacs-lisp
-  (setq package-archives nil)
-
-  (defvar melpa '("melpa" . "http://melpa.org/packages/"))
-  (defvar org-elpa '("org" . "http://orgmode.org/elpa/"))
-  (defvar elpa '("elpa" . "http://elpa.gnu.org/packages/"))
-  (add-to-list 'package-archives melpa t)
-  (add-to-list 'package-archives org-elpa t)
-  (add-to-list 'package-archives elpa t)
-#+END_SRC
-
-Initialize the archive and refresh the contents in case there is no cached archive.
-
-#+BEGIN_SRC emacs-lisp
-  (package-initialize)
-
-  ;; NOTE(john): This is the majority of startup speed time. For some
-  ;; reason the melpa-stable one doesn't appear for me, but I assume it
-  ;; has to do with Windows? When the melpa-stable item was missing it
-  ;; would always try to refresh package contents.
-  ;; (file-exists-p (concat init-dir "elpa/archives/melpa-stable")))
-  (unless (and (file-exists-p (concat init-dir "elpa/archives/gnu"))
-               (file-exists-p (concat init-dir "elpa/archives/melpa")))
-    (package-refresh-contents))
-#+END_SRC
-
-Each time this file is loaded the list will be evaulated, and install any missing packages.
-
-#+NAME: credmp-package-installer
-#+BEGIN_SRC emacs-lisp
-  (defun packages-install (&rest packages)
-    (message "running packages-install")
-    (mapc (lambda (package)
-            (let ((name (car package))
-                  (repo (cdr package)))
-              (when (not (package-installed-p name))
-                (let ((package-archives (list repo)))
-                   (package-initialize)
-                   (package-install name)))))
-           packages)
-    (package-initialize)
-    (delete-other-windows))
-#+END_SRC
-
-** The package
-
-Install extensions if they're missing
-
-#+NAME: credmp-package-installer
-#+BEGIN_SRC emacs-lisp
-  (defun init--install-packages ()
-    (message "Let's install some packages")
-    (packages-install
-     ;; this is the only entry here because use-package is used later
-     (cons 'use-package melpa)))
-  (condition-case nil
-      (init--install-packages)
-    (error
-     (package-refresh-contents)
-     (init--install-packages)))
-  (require 'use-package)
-#+END_SRC
-
-* Internals
-This section is about the internal behavior of Emacs.
-
-** Environment
-On Ubuntu I usually launch the app through the M-<Space> launcher
-thingy. Unfortunately it doesn't pick up the env vars I depend on from
-the terminal. This should address that.
-
-#+BEGIN_SRC emacs-lisp
-  (when (or (eq system-type 'gnu/linux) (eq system-type 'linux))
-    (use-package exec-path-from-shell
-      :ensure t
-      :init (progn
-               (exec-path-from-shell-copy-env "GOPATH")
-               (exec-path-from-shell-copy-env "NVM_DIR")
-               (exec-path-from-shell-initialize))))
-#+END_SRC
-** Backup
-
-The default behavior of Emacs is to litter the same directory with temporary files. It looks like auto-save is enabled here, so we'll see how long I tolerate that for.
-
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar --backup-directory (concat init-dir "backups"))
 
   (if (not (file-exists-p --backup-directory))
@@ -166,171 +42,137 @@ The default behavior of Emacs is to litter the same directory with temporary fil
 
   (setq backup-directory-alist `(("." . ,--backup-directory)))
   (setq make-backup-files t               ; backup of a file the first time it is saved.
-        backup-by-copying t               ; don't clobber symlinks
-        version-control t                 ; version numbers for backup files
-        delete-old-versions t             ; delete excess backup files silently
-        delete-by-moving-to-trash t
-        kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
-        kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
-        auto-save-default t               ; auto-save every buffer that visits a file
-        auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
-        auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
+	backup-by-copying t               ; don't clobber symlinks
+	version-control t                 ; version numbers for backup files
+	delete-old-versions t             ; delete excess backup files silently
+	delete-by-moving-to-trash t
+	kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
+	kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
+	auto-save-default t               ; auto-save every buffer that visits a file
+	auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
+	auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
     )
 
     (setq backup-directory-alist `(("." . ,(expand-file-name
-                                            (concat init-dir "backups")))))
-#+END_SRC
-
-Emacs uses lockfiles, but doesn't provide any way to customize their usage, as with =backup-directory-alist=. Disabling it, for now.
+					    (concat init-dir "backups")))))
+#+end_src
 
 #+begin_src emacs-lisp
   (when (or (eq system-type 'linux)
-            (eq system-type 'gnu/linux))
+	    (eq system-type 'gnu/linux))
     (setq create-lockfiles nil))
 #+end_src
-** Platform Specific
-When using dired on MacOS, you get an error like =ls does not support --dired=. See [[https://stackoverflow.com/questions/25125200/emacs-error-ls-does-not-support-dired][this question on SO]].
-#+BEGIN_SRC emacs-lisp
-(when (string= system-type "darwin")
-  (setq dired-use-ls-dired nil))
-#+END_SRC
-* Look and feel
+** Editing
 
-Ditch the lousy bars and obnoxious bell.
+By default Emacs does not overwrite a region with new input, unlike virtually every other program in existence.
+   
+#+begin_src emacs-lisp
+  (delete-selection-mode 1)
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (when (boundp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
-  (global-hl-line-mode)
-  (global-linum-mode)
+*** Beginning of Line
+Change the default =C-a= behavior to jump between the beginning and end of whitespace at the start of the line. I picked this up from [[http://pages.sachachua.com/.emacs.d/Sacha.html#org86eb05b][sachachua's configuration]].
+#+begin_src emacs-lisp
+  (defun my/smarter-move-beginning-of-line (arg)
+    "Move point back to indentation of beginning of line.
+  
+  Move point to the first non-whitespace character on this line.
+  If point is already there, move to the beginning of the line.
+  Effectively toggle between the first non-whitespace character and
+  the beginning of the line.
+  
+  If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+  point reaches the beginning or end of the buffer, stop there."
+    (interactive "^p")
+    (setq arg (or arg 1))
+  
+    ;; Move lines first
+    (when (/= arg 1)
+      (let ((line-move-visual nil))
+	(forward-line (1- arg))))
+  
+    (let ((orig-point (point)))
+      (back-to-indentation)
+      (when (= orig-point (point))
+	(move-beginning-of-line 1))))
+  
+  ;; remap C-a to `smarter-move-beginning-of-line'
+  (global-set-key [remap move-beginning-of-line]
+		  'my/smarter-move-beginning-of-line)
+#+end_src
 
+** Noise
+By default, Emacs makes noise when you do things like try to move past the end of a buffer, which I prefer to disable.
+
+#+begin_src emacs-lisp
   (defun my-bell-function ())
   (setq ring-bell-function 'my-bell-function)
   (setq visible-bell nil)
-  (setq column-number-mode t)
-  (setq-default cursor-type 'bar)
-  ; (setq initial-buffer-choice 'elfeed)
-  (add-hook 'after-init-hook 'org-agenda-list)
-  (put 'narrow-to-region 'disabled nil)
-#+END_SRC
+#+end_src
+  
+** Configuration Conveniences
+  While working on my Emacs configuration, it's helpful to be able to reload quickly. I like to use =C-|= for loading my =init.el= again.
 
-Theme
+#+begin_src emacs-lisp
+  (defun johncoder/reload ()
+    (interactive)
+    (load-file "~/.emacs.d/init.el"))
 
+  (global-set-key (kbd "C-|") 'johncoder/reload)
+#+end_src
+
+** Package Sources
+Point Emacs at package archives.
+#+begin_src emacs-lisp
+  (setq package-archives nil)
+
+  (defvar melpa '("melpa" . "https://melpa.org/packages/"))
+  (defvar org-elpa '("org" . "https://orgmode.org/elpa/"))
+  (defvar elpa '("elpa" . "https://elpa.gnu.org/packages/"))
+
+  (add-to-list 'package-archives melpa t)
+  (add-to-list 'package-archives org-elpa t)
+  (add-to-list 'package-archives elpa t)
+#+end_src
+
+I'll be relying on =use-package= to set up packages, but it'll need to be fetched before continuing.
+
+#+begin_src emacs-lisp
+  (condition-case nil
+      (progn
+	(require 'use-package))
+    (file-error
+     (progn
+       (package-refresh-contents)
+       (package-install 'use-package))))
+#+end_src
+
+** Theme
+I like to use [[https://nordtheme.com][nord]].
 #+begin_src emacs-lisp
   (use-package nord-theme
     :ensure t
     :config (load-theme 'nord t))
 #+end_src
 
-Font
-
-#+NAME: credmp-package-installer
-#+BEGIN_SRC emacs-lisp
-  (if (eq system-type 'windows-nt)
-      (set-face-attribute 'default nil :font "Consolas" :height 140))
-  (if (eq system-type 'darwin)
-      ; (set-face-attribute 'default nil :font "JetBrains Mono" :height 140))
-      (set-face-attribute 'default nil :font "Office Code Pro" :height 140))
-  (set-face-attribute 'default nil :height 140)
-#+END_SRC
-
-Colorful compilation buffer
-
-#+BEGIN_SRC emacs-lisp
-(when (require 'ansi-color nil t)
-  (defun my-colorize-compilation-buffer ()
-    (ansi-color-apply-on-region compilation-filter-start (point-max)))
-  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
-#+END_SRC
-
-Scroll to the first error in the compilation buffer
-
-#+BEGIN_SRC emacs-lisp
-(setq compilation-scroll-output 'first-error)
-#+END_SRC
-
-Center the buffer!
-
-#+begin_src emacs-lisp
-  (use-package centered-window
-    :ensure t)
-#+end_src
-
-Beacon
-#+begin_src emacs-lisp
-  (use-package beacon
-    :ensure t
-    :init
-    (setq beacon-blink-when-point-moves 1)
-    (beacon-mode 1))
-#+end_src
-
-[[https://www.emacswiki.org/emacs/TransparentEmacs][Transparency]] in the emacs client frame is pretty nice to have. I elected not to bind this to keys for simplicity. To enable, run:
-
-=M-x toggle-transparency=
-
-#+BEGIN_SRC emacs-lisp
-(defun toggle-transparency ()
-  (interactive)
-  (let ((alpha (frame-parameter nil 'alpha)))
-    (set-frame-parameter
-      nil 'alpha
-      (if (eql (cond ((numberp alpha) alpha)
-                     ((numberp (cdr alpha)) (cdr alpha))
-                     ;; Also handle undocumented (<active> <inactive>) form.
-                     ((numberp (cadr alpha)) (cadr alpha)))
-               100)
-          '(85 . 50) '(100 . 100)))))
-#+END_SRC
-
-Emoji support!
-
-#+BEGIN_SRC emacs-lisp
-  (use-package emojify
-    :ensure t
-    :init (global-emojify-mode))
-#+END_SRC
-
-Powerline
-
-There's an annoying bug on macOS that prevents the separator
-characters from using the correct background colors. The bit about
-=srgb-colorspace= pertains to fixing that.
-
-Depending on the version of emacs that is installed, I have had to use
-either =nil= or =1= for the value of =ns-use-srgb-colorspace=.
+*** Powerline
 
 #+begin_src emacs-lisp
   (setq powerline-image-apple-rgb t)
   (use-package powerline
     :ensure t
     :config (when (eq system-type 'darwin)
-              (setq ns-use-srgb-colorspace 1))
+	      (setq ns-use-srgb-colorspace 1))
     :init (powerline-default-theme))
 #+end_src
-
-#+RESULTS:
-
-** Editor
-#+BEGIN_SRC emacs-lisp
-  (delete-selection-mode 1)
-#+END_SRC
-
-** Moving Around
-*** Bookmarks
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package bm
-  ;;   :ensure t
-  ;;   :bind (("C-c =" . bm-toggle)
-  ;;          ("C-c [" . bm-previous)
-  ;;          ("C-c ]" . bm-next)))
-#+END_SRC
-
-*** Ivy/Counsel/Swiper
-
-#+BEGIN_SRC emacs-lisp
+*** Center
+#+begin_src emacs-lisp
+  (use-package centered-window
+    :ensure t)
+#+end_src
+** Productivity
+Improve the way I navigate the Emacs interface via counsel, swiper, and projectile.
+#+begin_src emacs-lisp
   (use-package counsel
     :ensure t
     :bind
@@ -361,20 +203,20 @@ either =nil= or =1= for the value of =ns-use-srgb-colorspace=.
        (setq ivy-use-virtual-buffers t)
        (define-key read-expression-map (kbd "C-r") #'counsel-expression-history)
        (ivy-set-actions
-        'counsel-find-file
-        '(("d" (lambda (x) (delete-file (expand-file-name x)))
-           "delete"
-           )))
+	'counsel-find-file
+	'(("d" (lambda (x) (delete-file (expand-file-name x)))
+	   "delete"
+	   )))
        (ivy-set-actions
-        'ivy-switch-buffer
-        '(("k"
-           (lambda (x)
-             (kill-buffer x)
-             (ivy--reset-state ivy-last))
-           "kill")
-          ("j"
-           ivy--switch-buffer-other-window-action
-           "other window")))))
+	'ivy-switch-buffer
+	'(("k"
+	   (lambda (x)
+	     (kill-buffer x)
+	     (ivy--reset-state ivy-last))
+	   "kill")
+	  ("j"
+	   ivy--switch-buffer-other-window-action
+	   "other window")))))
 
   (use-package counsel-projectile
     :ensure t
@@ -383,343 +225,160 @@ either =nil= or =1= for the value of =ns-use-srgb-colorspace=.
     (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
   (use-package ivy-hydra :ensure t)
-#+END_SRC
-*** Beginning of Line
-Defines a different behavior for `C-a`, moving to the first character
-instead of the true beginning of the line. If the cursor is already at
-the logical beginning of the line it will jump to the actual beginning
-of the line. From: [[http://pages.sachachua.com/.emacs.d/Sacha.html#org5564fb9][sachachua.com/.emacs.d]]
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/smarter-move-beginning-of-line (arg)
-    "Move point back to indentation of beginning of line.
-
-  Move point to the first non-whitespace character on this line.
-  If point is already there, move to the beginning of the line.
-  Effectively toggle between the first non-whitespace character and
-  the beginning of the line.
-
-  If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-  point reaches the beginning or end of the buffer, stop there."
-    (interactive "^p")
-    (setq arg (or arg 1))
-
-    ;; Move lines first
-    (when (/= arg 1)
-      (let ((line-move-visual nil))
-        (forward-line (1- arg))))
-
-    (let ((orig-point (point)))
-      (back-to-indentation)
-      (when (= orig-point (point))
-        (move-beginning-of-line 1))))
-
-  ;; remap C-a to `smarter-move-beginning-of-line'
-  (global-set-key [remap move-beginning-of-line]
-                  'my/smarter-move-beginning-of-line)
-#+END_SRC
-*** Misc
-#+begin_src emacs-lisp
-(use-package smartparens
-  :ensure t
-  :config (smartparens-global-mode 1))
 #+end_src
-* Productivity
-** Reading
-#+BEGIN_SRC emacs-lisp
-(use-package nov
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 
-(use-package pdf-tools
-  :ensure t)
-#+END_SRC
-** Org
-Lately I've been having trouble getting org stuff to compile? I found [[https://emacs.stackexchange.com/a/58672][this answer]] on emacs.stackexchange.com
+Dumb Jump
 
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/elpa/org*")  
-(setq load-prefer-newer t)
-#+END_SRC
-
-Then, all the usual stuff...
-
-#+BEGIN_SRC emacs-lisp
-      (use-package org
-        :ensure org-plus-contrib)
-
-  (require 'org-habit)
-  (defun org-drill-all ()
-    "Begins an org-drill session using all notes."
-    (interactive)
-    (org-drill
-     (directory-files-recursively "~/org/notes/" "\.org$")))
-
-  (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
-        org-startup-indented t
-        org-agenda-span 'day
-        ;; org-log-into-drawer t
-        org-clock-idle-time 10
-        org-return-follows-link t
-        org-special-ctrl-a/e t
-        org-pretty-entities t
-        org-pretty-entities-include-sub-superscripts t
-        org-agenda-skip-scheduled-if-deadline-is-shown t
-        org-drill-learn-fraction 0.3
-        org-log-done 'time)
-  (add-to-list 'org-modules 'org-habit t)
-  (setq org-habit-graph-column 80)
-  (use-package gnuplot
-    :ensure t)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((dot . t)
-     (ruby . t)
-     (python . t)
-     (restclient . t)
-     (js . t)
-     (gnuplot . t)
-     (shell . t)
-     (plantuml . t)
-     (sql . t)))
-  (setq org-confirm-babel-evaluate nil)
-
-  (setq org-plantuml-jar-path
-        (expand-file-name "~/Downloads/plantuml.jar"))
-
-  (use-package elfeed
-    :ensure t)
-  (require 'elfeed)
-  (use-package elfeed-org
-    :ensure t)
-
-  ;; (require 'org-drill)
-  (use-package org-drill
-    :ensure t)
-
-      ;; NOTE(john): Because template expansions are borked?
-      ;; SEE: https://github.com/syl20bnr/spacemacs/issues/11798
-      (require 'org-tempo)
-
-      (define-key global-map "\C-ca" 'org-agenda)
-      (define-key global-map "\C-cc" 'org-capture)
-      (define-key global-map "\C-cl" 'org-store-link)
-
-      (setq org-agenda-files (list "~/org"))
-
-      (add-hook 'org-mode-hook 'visual-line-mode)
-      (add-hook 'org-mode-hook 'flyspell-mode)
-      (add-hook 'org-mode-hook 'org-display-inline-images)
-
-      (defun johncoder/chmod-after-tangle ()
-        "Some tangled files are intended to be executed."
-        (when (string-suffix-p ".sh" (buffer-file-name))
-          (set-file-modes (buffer-file-name) #o755)))
-      (add-hook 'org-babel-post-tangle-hook 'johncoder/chmod-after-tangle)
-
-      (setq org-timer-done-hook nil)
-      (when (and (eq system-type 'darwin) (not t)) ; NOTE(john): disable this because that sound isn't available
-        (add-hook 'org-timer-done-hook
-                  (lambda ()
-                    (shell-command "afplay -v 5 ~/Downloads/level-up.mp3"))))
-
-      (defun org-drill-all ()
-        "Begins an org-drill session using all notes."
-        (interactive)
-        (org-drill
-          (directory-files-recursively "~/org/notes/" "\.org$")))
-
-      (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
-            org-startup-indented t
-            org-agenda-span 'day
-            ;; org-log-into-drawer t
-            org-clock-idle-time 10
-            org-return-follows-link t
-            org-special-ctrl-a/e t
-            org-pretty-entities t
-            org-pretty-entities-include-sub-superscripts t
-            org-agenda-skip-scheduled-if-deadline-is-shown t
-            org-drill-learn-fraction 0.3
-            org-log-done 'time)
-      (add-to-list 'org-modules 'org-habit t)
-      (setq org-habit-graph-column 80)
-      (use-package gnuplot
-        :ensure t)
-      (org-babel-do-load-languages
-        'org-babel-load-languages
-        '((dot . t)
-          (lisp . t)
-          (ruby . t)
-          (python . t)
-          (restclient . t)
-          (js . t)
-          (gnuplot . t)
-          (shell . t)
-          (plantuml . t)))
-      (setq org-confirm-babel-evaluate nil)
-
-      (setq org-plantuml-jar-path
-          (expand-file-name "~/Downloads/plantuml.jar"))
-
-      (use-package elfeed
-        :ensure t)
-      (require 'elfeed)
-      (use-package elfeed-org
-        :ensure t)
-
-      (use-package elfeed-goodies
-        :ensure t)
-
-      ;; (require 'elfeed-org)
-      ;; (require 'elfeed-goodies)
-      (elfeed-org)
-      (elfeed-goodies/setup)
-      (setq rmh-elfeed-org-files '("~/org/rss.org"))
-      (setf elfeed-db-directory "~/org/elfeed-db")
-      (setf elfeed-goodies/entry-pane-position 'bottom)
-
-      (use-package org-roam
-        :ensure t
-        :hook (after-init . org-roam-mode)
-        :config (setq org-roam-directory "~/org/roam"))
-#+END_SRC
-** Capture Templates
-
-| Placeholder | Description                 |
-|-------------+-----------------------------|
-| %U          | Inactive timestamp          |
-| ~%^{Name}~  | Prompt for something        |
-| %a          | Annotation (org-store-link) |
-| %i          | Active region               |
-| %?          | Cursor ending location      |
-
-#+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-  '(
-     ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
-     ("c" "Clock item"            item  (clock) "  - %i%?")
-     ("p" "Pager Duty Log Item"   plain (file+headline "~/org/pagerduty.org" "Log")  "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
-     ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
-     ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
-     ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
-     ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
-     ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
-        ))
-#+END_SRC
-
-** Quick Tools
-In the web development world it's pretty common to use uuids, and while working in documentation or sample code it has been helpful to generate sample values.
-#+BEGIN_SRC emacs-lisp
-  (require 'org-id) ; I don't think I need this
-  (defun uuid ()
-    "Generate and insert a uuid.
-  From http://ergoemacs.org/emacs/elisp_generate_uuid.html"
-    (interactive)
-    (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
-                                (user-uid)
-                                (emacs-pid)
-                                (system-name)
-                                (user-full-name)
-                                (current-time)
-                                (emacs-uptime)
-                                (garbage-collect)
-                                (buffer-string)
-                                (random)
-                                (recent-keys)))))
-        (insert (format "%s-%s-4%s-%s%s-%s"
-                        (substring myStr 0 8)
-                        (substring myStr 8 12)
-                        (substring myStr 13 16)
-                        (format "%x" (+ 8 (random 4)))
-                        (substring myStr 17 20)
-                        (substring myStr 20 32)))))
-#+END_SRC
-
-* Version Control
-
-#+NAME: magit
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
+#+begin_src emacs-lisp
+  (use-package dumb-jump
     :ensure t
     :config
-    (global-set-key (kbd "C-c m") 'magit-status))
-#+END_SRC
+    (global-set-key (kbd "<f12>") 'dumb-jump-go)
+    (global-set-key (kbd "C-=") 'dumb-jump-go)
+    (global-set-key (kbd "C-<f12>") 'pop-tag-mark)
+    (global-set-key (kbd "C-+") 'pop-tag-mark))
+  
+#+end_src
+** Org
+The =org-plus-contrib= package is essential.
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure org-plus-contrib)
+  (require 'org-tempo)
+#+end_src
 
+Org keybindings
+
+#+begin_src emacs-lisp
+  (define-key global-map "\C-ca" 'org-agenda)
+  (define-key global-map "\C-cc" 'org-capture)
+  (define-key global-map "\C-cl" 'org-store-link)
+#+end_src
+
+Ensure that org behaves more naturally:
+ 
+#+begin_src emacs-lisp
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+#+end_src
+
+*** Capture Templates
+I like to keep my org files around, and sometimes I'm forgetful about creating the folder when setting up Emacs on a new machine.
+
+#+begin_src emacs-lisp
+  (defvar johncoder--org-directory "~/org")
+  
+  (if (not (file-exists-p johncoder--org-directory))
+      (make-directory johncoder--org-directory t))
+#+end_src
+  
+#+begin_src emacs-lisp
+    (setq org-capture-templates
+	  '(
+	    ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
+	    ("c" "Clock item"            item  (clock) "  - %i%?")
+	    ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
+	    ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
+	    ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
+	    ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
+	    ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
+	    ))
+#+end_src
+
+** Reading
+#+begin_src emacs-lisp
+  (use-package nov
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+  
+  (use-package pdf-tools
+    :ensure t)
+#+end_src
 * Programming
 ** General
-Nix
+*** Compilation
+#+begin_src emacs-lisp
+  (setq compilation-scroll-output 'first-error)
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
-  (use-package nix-mode
+Colorful Compilation
+#+begin_src emacs-lisp
+  (when (require 'ansi-color nil t)
+    (defun my-colorize-compilation-buffer ()
+      (ansi-color-apply-on-region compilation-filter-start (point-max)))
+    (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+#+end_src
+*** Parens
+#+begin_src emacs-lisp
+  (use-package smartparens
     :ensure t
-    :mode "\\.nix\\'")
-#+END_SRC
+    :config (smartparens-global-mode 1))  
+#+end_src
+*** Highlight Comment Markers
 
-#+BEGIN_SRC emacs-lisp
+I tend to leave comment markers in code, and it's helpful to highlight them to better catch my attention.
+#+begin_src emacs-lisp
   ;; Colorful Markers
-  (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode js2-mode go-mode python-mode rjsx-mode typescript-mode))
   (make-face 'font-lock-fixme-face)
   (make-face 'font-lock-study-face)
   (make-face 'font-lock-important-face)
   (make-face 'font-lock-question-face)
   (make-face 'font-lock-note-face)
   (make-face 'font-lock-see-face)
-  (mapc (lambda (mode)
-          (font-lock-add-keywords
-           mode
-           '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-             ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
-             ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
-             ("\\<\\(QUESTION\\)" 1 'font-lock-question-face t)
-             ("\\<\\(SEE\\)" 1 'font-lock-see-face t)
-             ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
-        fixme-modes)
   (modify-face 'font-lock-fixme-face "#BF616A" nil nil t nil t nil nil)
   (modify-face 'font-lock-study-face "#8FBCBB" nil nil t nil t nil nil)
   (modify-face 'font-lock-important-face "#EBCB8B" nil nil t nil t nil nil)
   (modify-face 'font-lock-question-face "#D08770" nil nil t nil t nil nil)
   (modify-face 'font-lock-see-face "#5E81AC" nil nil t nil t nil nil)
   (modify-face 'font-lock-note-face "#B48EAD" nil nil t nil t nil nil)
-#+END_SRC
-
-*Flycheck Mode*
-
-#+BEGIN_SRC emacs-lisp
-(use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
-#+END_SRC
-
-
-*Company Mode*
-
-#+BEGIN_SRC emacs-lisp
+  
+  (setq fixme-modes '(c++-mode
+		      c-mode
+		      emacs-lisp-mode
+		      js2-mode
+		      go-mode
+		      python-mode
+		      ruby-mode
+		      rjsx-mode
+		      typescript-mode))
+  
+  (mapc (lambda (mode)
+	  (font-lock-add-keywords
+	   mode
+	   '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+	     ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
+	     ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+	     ("\\<\\(QUESTION\\)" 1 'font-lock-question-face t)
+	     ("\\<\\(SEE\\)" 1 'font-lock-see-face t)
+	     ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+	fixme-modes)
+#+end_src
+*** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
+#+end_src
+*** LSP
+#+begin_src emacs-lisp
   (defvar +lsp-company-backends 'company-capf)
   (use-package company
     :ensure t
     :init (add-hook 'after-init-hook 'global-company-mode))
-
+  
   (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024)) ;; 1mb
   (setq lsp-completion-provider :capf)
-
-  ;; TODO(john): if s-l doesn't work out, it can be changed
-  ;; (setq lsp-keymap-prefix "C-;")
+  
   (use-package lsp-mode
     :ensure t
     :hook ((go-mode . lsp)
-           (ruby-mode . lsp))
+	   (ruby-mode . lsp))
     :commands lsp)
-  (use-package company-lsp
-    :ensure t)
-#+END_SRC
-
-#+RESULTS:
-
-*Web Mode*
-
-#+BEGIN_SRC emacs-lisp
+#+end_src
+*** Web Mode
+#+begin_src emacs-lisp
   (use-package web-mode
     :ensure t
     :config
@@ -730,112 +389,85 @@ Nix
     (setq web-mode-enable-auto-closing t)
     (setq web-mode-enable-auto-quoting t)
     (setq web-mode-markup-indent-offset 2))
-#+END_SRC
-** restclient
-#+BEGIN_SRC emacs-lisp
+#+end_src
+*** Rest Client
+#+begin_src emacs-lisp
   (use-package restclient
     :ensure t)
   (use-package ob-restclient
     :ensure t)
-#+END_SRC
-** Redis
+#+end_src
+*** GraphQL
+#+begin_src emacs-lisp
+  (use-package graphql-mode
+    :ensure t)
+  (use-package request
+    :ensure t)
+#+end_src
+** Data/Systems
+*** Docker
+#+begin_src emacs-lisp
+  (use-package docker
+    :ensure t)
+  (use-package dockerfile-mode
+    :ensure t)
+  (use-package docker-tramp
+    :ensure t)
+  (use-package kubel
+    :ensure t)
+#+end_src
+*** Redis
 #+begin_src emacs-lisp
   (defun jrn-redis-hook ()
-    (local-set-key (kbd "C-c C-c") 'redis-send-current-line))      ; :hook (redis-cli-mode . jrn-redis-hook))
-
+    ;; :hook (redis-cli-mode . jrn-redis-hook))
+    (local-set-key (kbd "C-c C-c") 'redis-send-current-line))
+  
   (use-package eredis
     :ensure t)
   (use-package redis
     :ensure t)
 #+end_src
-** dumb jump
-#+BEGIN_SRC emacs-lisp
-  (use-package dumb-jump
-    :ensure t
-    :config
-    (global-set-key (kbd "<f12>") 'dumb-jump-go)
-    (global-set-key (kbd "C-=") 'dumb-jump-go)
-    (global-set-key (kbd "C-<f12>") 'pop-tag-mark)
-    (global-set-key (kbd "C-+") 'pop-tag-mark))
-#+END_SRC
+*** SQL
+#+begin_src emacs-lisp
+  (add-hook 'sql-interactive-mode-hook
+	    (lambda ()
+	      (toggle-truncate-lines t)))
+#+end_src
 
-** Go
-Go comes with an emacs package to invoke their [[https://github.com/golang/lint#emacs][linter]]!
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path
-    (concat (getenv "GOPATH")
-            "/src/golang.org/x/lint/misc/emacs"))
-(add-to-list 'load-path
-    (concat (getenv "HOME")
-            "/go/src/golang.org/x/lint/misc/emacs"))
-(require 'golint)
-#+END_SRC
-
-Go Mode
-
-#+BEGIN_SRC emacs-lisp
-  (use-package go-guru
-    :ensure t)
-
-  (defun jrn-go-mode-hook ()
-    ;; TODO(john): Check and see if I really want to do this...
-    (if (executable-find "goimports")
-        (setq gofmt-command "goimports"))
-
-    (add-hook 'before-save-hook 'gofmt-before-save)
-
-    (setq imenu-generic-expression
-          '(("type" "^[ \t]*type *\\([^ \t\n\r\f]*[ \t]*\\(struct\\|interface\\)\\)" 1)
-            ("func" "^func *\\(.*\\)" 1)))
-
-    (use-package gotest
-      :ensure t
-      :bind (("C-c , f" . go-test-current-file)
-             ("C-c , t" . go-test-current-test)
-             ("C-c , p" . go-test-current-project)))
-
-    ;; SEE(john): https://melpa.org/#/go-guru
-    ;; SEE(john): These are the keybindings...
-    ;; https://github.com/dominikh/go-mode.el/blob/1bbe1d0cb88564e6c5b74ccd78ab87a8b9998374/go-guru.el#L106-L118
-    (go-guru-hl-identifier-mode)
-
-    (local-set-key (kbd "s-.") 'godef-jump)
-    (local-set-key (kbd "s->") 'pop-tag-mark)
-    (setq tab-width 4
-          go-tab-width 4))
-
-  (use-package go-mode
-    :ensure t
-    :hook (go-mode . jrn-go-mode-hook))
-
-  (use-package flycheck-golangci-lint
-    :ensure t
-    :hook (go-mode . flycheck-golangci-lint-setup))
-  (use-package company-go
-    :ensure t
-    :hook (go-mode . (lambda ()
-                       (set (make-local-variable 'company-backends) '(company-go))
-                       (company-mode))))
-#+END_SRC
-
-Here's an annoying one! Go's module files will open with the mode used
-for the =Modula-2= programming language. I don't see myself using
-that, so seems fitting to hijack this to be something sensible, like
-=fundamental-mode=!
+This adds =port= to the list of fields that get prompted when logging into postgres
 
 #+begin_src emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.mod" . fundamental-mode))
+(require 'sql)
+(add-to-list 'sql-postgres-login-params '(port))
 #+end_src
+*** YAML
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :ensure t)
+#+end_src
+*** Terraform
+#+begin_src emacs-lisp
+  (use-package terraform-mode
+    :ensure t)
+#+end_src
+** Git
+Use magit and bind status.
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (global-set-key (kbd "C-c m") 'magit-status))
+#+end_src
+
 ** Emacs Lisp
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq c-default-style "bsd"
-        c-basic-offset 4
-        tab-width 4
-        indent-tabs-mode nil)
-#+END_SRC
-** Lisp
-#+BEGIN_SRC emacs-lisp
+	c-basic-offset 4
+	tab-width 4
+	indent-tabs-mode nil)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package slime
   :ensure t)
 
@@ -846,101 +478,22 @@ that, so seems fitting to hijack this to be something sensible, like
   (when (file-exists-p quicklisp-filename)
     (load (expand-file-name quicklisp-filename)))
     (setq inferior-lisp-program "/usr/bin/sbcl"))
-#+END_SRC
-** Python
-#+BEGIN_SRC emacs-lisp
-  ;(setq python-shell-interpreter "nix-shell python")
-  (use-package python-info
-    :ensure t)
-  (setq python-shell-completion-native-enable nil)
-#+END_SRC
-
-** Ruby
-#+begin_src emacs-lisp
-  (use-package ruby-mode
-    :ensure t
-    :bind
-    ((("C-c C-c" . ruby-send-region))))
 #+end_src
-
-Ruby Interpreter for repl goodness
+** Nix
 #+begin_src emacs-lisp
-  (use-package inf-ruby
+  (use-package nix-mode
     :ensure t
-    :init
-    (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode))
-#+end_src
-Rake
-
-#+begin_src emacs-lisp
-(use-package rake
-  :ensure t
-  :config
-  (eval-after-load 'projectile
-    '(setq rake-completion-system projectile-completion-system)))
+    :mode "\\.nix\\'")
 #+end_src
 ** C/C++
-Make emacs behave for C
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-common-hook
-            '(lambda ()
-               (progn (c-set-style "bsd" nil)
-                      (setq c-basic-offset 4))))
-#+END_SRC
-
-** C#
-
-#+BEGIN_SRC emacs-lisp
-  (use-package csharp-mode
-    :ensure t)
-#+END_SRC
-
-** F#
-#+BEGIN_SRC emacs-lisp
-;; (use-package fsharp-mode
-;;   :ensure t)
-#+END_SRC
-** JavaScript
-Super annoying, but whenever you see these compiler warnings:
-
-#+BEGIN_QUOTE
-Warning (bytecomp): ‘beginning-of-buffer’ is for interactive use only;
-use ‘(goto-char (point-min))’ instead.
-Warning (bytecomp): ‘replace-string’ is for interactive use only; use
-‘search-forward’ and ‘replace-match’ instead.
-#+END_QUOTE
-
-See [[https://github.com/jsx/jsx-mode.el/pull/15/files][PR to fix these warnings]]
-
-I just went in and made the changes to =jsx-mode.el=.
-
-#+BEGIN_SRC emacs-lisp
-;;  (use-package jsx-mode
-;;    :ensure t)
-;;  (add-hook 'js-mode-hook (lambda () (setq js-indent-level 2)))
-;;  (add-hook 'js2-mode-hook (lambda () (setq js2-basic-offset 2)))
-#+END_SRC
-
 #+begin_src emacs-lisp
-  (setq js-indent-level 2)
+  (add-hook 'c-mode-common-hook
+	    '(lambda ()
+	       (progn (c-set-style "bsd" nil)
+		      (setq c-basic-offset 4))))
+  
 #+end_src
-
-React!
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package rjsx-mode
-  ;;   :ensure t)
-  ;; (add-hook 'rjsx-mode-hook
-  ;;   (lambda ()
-  ;;     (setq indent-tabs-mode nil) ;;Use space instead of tab
-  ;;     (setq js-indent-level 2) ;;space width is 2 (default is 4)
-  ;;     (setq js2-strict-missing-semi-warning nil)))
-  ;; (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . rjsx-mode))
-#+END_SRC
-
-*Typescript*
-
+** TypeScript
 #+begin_src emacs-lisp
   (use-package typescript-mode
     :ensure t
@@ -949,95 +502,46 @@ React!
   (setq typescript-indent-level 2)
 #+end_src
 
-#+BEGIN_SRC emacs-lisp
+Tide provides all the nice features for TypeScript in Emacs
+
+#+begin_src emacs-lisp
+  (setq js-indent-level 2)
   (setq js2-basic-offset 2)
   (use-package tide
     :ensure t
     :after (typescript-mode company flycheck)
     :bind (("s-." . tide-fix))
     :hook ((typescript-mode . tide-setup)
-           (typescript-mode . tide-hl-identifier-mode)
-           (before-save . tide-format-before-save)))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flow-minor-mode
+	   (typescript-mode . tide-hl-identifier-mode)
+	   (before-save . tide-format-before-save)))
+#+end_src
+** Ruby
+#+begin_src emacs-lisp
+  (use-package ruby-mode
     :ensure t
-    :hook (add-hook 'js2-mode-hook 'flow-minor-enable-automatically))
-#+END_SRC
-
-** PostgreSQL
-In the past I have used [[https://www.pgadmin.org/][pgAdmin]], but I want something right in emacs.
-
-The default connection prompts do not include a port number, thus include it ([[https://stackoverflow.com/questions/12613/specify-a-port-number-in-emacs-sql-mysql][source]]):
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package sql-postgres
-  ;;  :ensure t
-  ;;  :init
-  ;;  (progn
-  ;;    (require 'sql)
-  ;;    (add-to-list 'sql-postgres-login-params '(port))))
-  (require 'sql)
-  (add-to-list 'sql-postgres-login-params '(port))
-#+END_SRC
-
-** Docker
-This was immediately helpful in managing docker containers from within emacs. 10/10, so far!
-#+BEGIN_SRC emacs-lisp
-  (use-package docker
-    :ensure t)
-  (use-package dockerfile-mode
-    :ensure t)
-  (use-package docker-tramp
-    :ensure t)
-  (use-package kubel
-    :ensure t)
-#+END_SRC
-
-** GraphQL
-
+    :bind
+    ((("C-c C-c" . ruby-send-region))))
+  
+  (use-package inf-ruby
+    :ensure t
+    :init
+    (add-hook 'ruby-mode-hook 'inf-ruby-minor-mode))
+  
+  (use-package rake
+    :ensure t
+    :config
+    (eval-after-load 'projectile
+      '(setq rake-completion-system projectile-completion-system)))
+#+end_src
+** Python
 #+begin_src emacs-lisp
-    (use-package graphql-mode
-      :ensure t)
-    (use-package request
-      :ensure t)
+  (use-package python-info
+    :ensure t)
+  (setq python-shell-completion-native-enable nil)
 #+end_src
 
-** SQL
-
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'sql-interactive-mode-hook (lambda ()
-                                           (toggle-truncate-lines t)))
-#+END_SRC
-** Varnish
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package vcl-mode
-  ;;   :ensure t)
-#+END_SRC
-** YAML
-#+BEGIN_SRC emacs-lisp
-(use-package yaml-mode
-  :ensure t)
-#+END_SRC
-** Terraform
+* Key Bindings
 #+begin_src emacs-lisp
-  (use-package terraform-mode
-    :ensure t)
-#+end_src
-* Key bindings
-** Other Window
-#+BEGIN_SRC emacs-lisp
-  (defun other-window-prev ()
-    (interactive)
-    (other-window) -1)
-#+END_SRC
-
-#+begin_src emacs-lisp
-(winner-mode 1)
-#+end_src
-** Set
-#+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-<tab>") 'other-window)
   (global-set-key (kbd "C-S-<tab>") 'other-window-prev)
   (global-set-key (kbd "<f5>") 'compile)
@@ -1051,4 +555,4 @@ This was immediately helpful in managing docker containers from within emacs. 10
   (global-set-key (kbd "C-`") 'rgrep)
   (global-set-key (kbd "<f1>") 'ff-find-other-file)
   (global-set-key (kbd "<f8>") 'centered-window-mode)
-#+END_SRC
+#+end_src
