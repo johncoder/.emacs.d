@@ -155,6 +155,12 @@ I like to use [[https://nordtheme.com][nord]].
     :config (load-theme 'nord t))
 #+end_src
 
+*** Font
+#+begin_src emacs-lisp
+  (when (member "Office Code Pro" (font-family-list))
+    (set-face-attribute 'default nil :font "Office Code Pro" :height 140))
+#+end_src
+
 *** Powerline
 
 #+begin_src emacs-lisp
@@ -475,6 +481,29 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
     :ensure t)
 #+end_src
 *** SQL
+Specifying Connections
+
+#+begin_src emacs-lisp
+  (defvar sql-connection-alist nil)
+  
+  (defmacro sql-specify-connections (&rest connections)
+    "Set the sql-connection-alist from CONNECTIONS.
+  Generates respective interactive functions to establish each connection."
+    `(progn
+       ,@(mapcar (lambda (conn)
+                   `(add-to-list 'sql-connection-alist ',conn))
+                 connections)
+       ,@(mapcar (lambda (conn)
+                   (let* ((varname (car conn))
+                          (fn-name (intern (format "sql-connect-to-%s" varname)))
+                          (buf-name (format "*%s*" varname)))
+                     `(defun ,fn-name ,'()
+                        (interactive)
+                        (sql-connect ',varname ,buf-name))))
+                 connections)))
+  
+#+end_src
+
 #+begin_src emacs-lisp
   (add-hook 'sql-interactive-mode-hook
 	    (lambda ()
