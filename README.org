@@ -256,6 +256,7 @@ The =org-plus-contrib= package is essential.
 Settings
 
 #+begin_src emacs-lisp
+  (setq org-agenda-files (list "~/org"))
   (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
         org-startup-indented t
         org-agenda-span 'day
@@ -268,6 +269,14 @@ Settings
         org-agenda-skip-scheduled-if-deadline-is-shown t
         org-drill-learn-fraction 0.3
         org-log-done 'time)
+#+end_src
+
+Hooks
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'flyspell-mode)
+  (add-hook 'org-mode-hook 'org-display-inline-images)
 #+end_src
 
 Org keybindings
@@ -336,6 +345,42 @@ I like to keep my org files around, and sometimes I'm forgetful about creating t
 	    ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
 	    ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
 	    ))
+#+end_src
+
+*** Jira
+Put the configuration stuff in =./work.el=. Consult [[https://github.com/ahungry/org-jira][this page]] for more setup info.
+
+#+begin_src emacs-lisp
+  (use-package org-jira
+    :ensure t
+    :config
+    (unless (file-exists-p "~/.org-jira")
+      (make-directory "~/.org-jira"))
+    (define-key org-jira-entry-mode-map (kbd "C-i pg") 'org-jira-get-projects)
+    (define-key org-jira-entry-mode-map (kbd "C-i bg") 'org-jira-get-boards)
+    (define-key org-jira-entry-mode-map (kbd "C-i iv") 'org-jira-get-issues-by-board)
+    (define-key org-jira-entry-mode-map (kbd "C-i ib") 'org-jira-browse-issue)
+    (define-key org-jira-entry-mode-map (kbd "C-i ig") 'org-jira-get-issues)
+    (define-key org-jira-entry-mode-map (kbd "C-i ij") 'org-jira-get-issues-from-custom-jql)
+    (define-key org-jira-entry-mode-map (kbd "C-i ih") 'org-jira-get-issues-headonly)
+    ;;(define-key org-jira-entry-mode-map (kbd "C-c if") 'org-jira-get-issues-from-filter-headonly)
+    ;;(define-key org-jira-entry-mode-map (kbd "C-c iF") 'org-jira-get-issues-from-filter)
+    (define-key org-jira-entry-mode-map (kbd "C-i iu") 'org-jira-update-issue)
+    (define-key org-jira-entry-mode-map (kbd "C-i iw") 'org-jira-progress-issue)
+    (define-key org-jira-entry-mode-map (kbd "C-i in") 'org-jira-progress-issue-next)
+    (define-key org-jira-entry-mode-map (kbd "C-i ia") 'org-jira-assign-issue)
+                                          ;(define-key org-jira-entry-mode-map (kbd "C-c isr") 'org-jira-set-issue-reporter)
+    (define-key org-jira-entry-mode-map (kbd "C-i ir") 'org-jira-refresh-issue)
+    (define-key org-jira-entry-mode-map (kbd "C-i iR") 'org-jira-refresh-issues-in-buffer)
+    (define-key org-jira-entry-mode-map (kbd "C-i ic") 'org-jira-create-issue)
+    (define-key org-jira-entry-mode-map (kbd "C-i ik") 'org-jira-copy-current-issue-key)
+    (define-key org-jira-entry-mode-map (kbd "C-i sc") 'org-jira-create-subtask)
+    (define-key org-jira-entry-mode-map (kbd "C-i sg") 'org-jira-get-subtasks)
+    (define-key org-jira-entry-mode-map (kbd "C-i cc") 'org-jira-add-comment)
+    (define-key org-jira-entry-mode-map (kbd "C-i cu") 'org-jira-update-comment)
+    (define-key org-jira-entry-mode-map (kbd "C-i wu") 'org-jira-update-worklogs-from-org-clocks)
+    (define-key org-jira-entry-mode-map (kbd "C-i tj") 'org-jira-todo-to-jira)
+    (define-key org-jira-entry-mode-map (kbd "C-i if") 'org-jira-get-issues-by-fixversion))
 #+end_src
 
 ** Reading
@@ -481,6 +526,20 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
     :ensure t)
 #+end_src
 *** SQL
+Indentation
+
+#+begin_src emacs-lisp
+  (add-hook 'sql-mode-hook (lambda()
+                             (setq indent-tabs-mode nil)))
+#+end_src
+
+Truncate lines for interactive mode
+
+#+begin_src emacs-lisp
+  (add-hook 'sql-interactive-mode-hook (lambda ()
+                                         (toggle-truncate-lines t)))
+#+end_src
+
 Specifying Connections
 
 #+begin_src emacs-lisp
@@ -573,8 +632,10 @@ Use magit and bind status.
 #+begin_src emacs-lisp
   (use-package typescript-mode
     :ensure t
-    :hook ((js2-mode . (lambda () (setq js2-basic-offset 2)))))
+    :hook ((js2-mode . (lambda () (setq js2-basic-offset 2)))
+           (typescript-mode . (lambda () (setq indent-tabs-mode nil)))))
   (add-to-list 'auto-mode-alist '("\\/.*\\.jsx\\'" . typescript-mode))
+  (add-to-list 'auto-mode-alist '("\\/.*\\.js\\'" . typescript-mode))
   (setq typescript-indent-level 2)
 #+end_src
 
