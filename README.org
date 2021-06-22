@@ -294,6 +294,14 @@ Ensure that org behaves more naturally:
   (setq org-src-tab-acts-natively t)
 #+end_src
 
+*** Export
+
+#+begin_src emacs-lisp
+  (use-package ox-gfm
+    :ensure t
+    :after '(org))
+#+end_src
+
 *** Babel
 
 Look into improving load time by defering the call to =org-babel-do-load-languages=. See [[https://blog.d46.us/advanced-emacs-startup/#org142995b][this]].
