@@ -245,6 +245,12 @@ Dumb Jump
     (global-set-key (kbd "C-+") 'pop-tag-mark))
   
 #+end_src
+
+Ignore files via =rgrep= customization. I want to be able to ignore common files that are littered in various places, such as TypeScript type definition files.
+
+#+begin_src emacs-lisp
+  (push "*.d.ts" grep-find-ignored-files)
+#+end_src
 ** Org
 The =org-plus-contrib= package is essential.
 #+begin_src emacs-lisp
@@ -657,8 +663,9 @@ Tide provides all the nice features for TypeScript in Emacs
     :after (typescript-mode company flycheck)
     :bind (("s-." . tide-fix))
     :hook ((typescript-mode . tide-setup)
-	   (typescript-mode . tide-hl-identifier-mode)
-	   (before-save . tide-format-before-save)))
+           (typescript-mode . tide-hl-identifier-mode)
+           ;; (before-save . tide-format-before-save)
+           ))
 #+end_src
 ** Go
 TODO
