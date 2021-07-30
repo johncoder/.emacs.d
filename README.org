@@ -70,6 +70,12 @@ By default Emacs does not overwrite a region with new input, unlike virtually ev
   (delete-selection-mode 1)
 #+end_src
 
+And, then there's the tab issue...
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
 *** Beginning of Line
 Change the default =C-a= behavior to jump between the beginning and end of whitespace at the start of the line. I picked this up from [[http://pages.sachachua.com/.emacs.d/Sacha.html#org86eb05b][sachachua's configuration]].
 #+begin_src emacs-lisp
