@@ -728,4 +728,14 @@ TODO
   (global-set-key (kbd "<f8>") 'centered-window-mode)
   (global-set-key (kbd "s-F") 'rgrep)
   (global-set-key (kbd "M-F") 'rgrep)
+  (global-set-key (kbd "C-`") (lambda ()
+                                (interactive)
+                                (let ((buf (get-buffer "*ansi-term*"))
+                                      (on-ansi-term (string-equal (buffer-name) "*ansi-term*")))
+                                  (if on-ansi-term
+                                      (progn (other-window -1)
+                                             (mode-line-other-buffer))
+                                    (unless buf
+                                      (ansi-term "/bin/zsh"))
+                                    (switch-to-buffer "*ansi-term*")))))
 #+end_src
