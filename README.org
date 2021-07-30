@@ -256,6 +256,7 @@ Ignore files via =rgrep= customization. I want to be able to ignore common files
 
 #+begin_src emacs-lisp
   (push "*.d.ts" grep-find-ignored-files)
+  (push "*.js.map" grep-find-ignored-files)
 #+end_src
 ** Org
 The =org-plus-contrib= package is essential.
