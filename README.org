@@ -473,6 +473,15 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
 	     ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
 	fixme-modes)
 #+end_src
+
+*** Rainbow Mode
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :hook (typescript-mode fundamental-mode lisp-mode emacs-lisp-mode web-mode org-mode)
+    :delight)
+#+end_src
 *** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
