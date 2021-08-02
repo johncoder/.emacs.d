@@ -18,7 +18,7 @@ Then, I like to have some more modern looking details.
 #+begin_src emacs-lisp
   (setq-default cursor-type 'bar)
   (global-hl-line-mode)
-  (global-linum-mode)
+  (global-display-line-numbers-mode)
   (setq column-number-mode t)
   (put 'narrow-to-region 'disabled nil)
 #+end_src
