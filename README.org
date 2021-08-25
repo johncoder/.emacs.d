@@ -155,15 +155,36 @@ I'll be relying on =use-package= to set up packages, but it'll need to be fetche
 ** Theme
 I like to use [[https://nordtheme.com][nord]].
 #+begin_src emacs-lisp
-  (use-package nord-theme
-    :ensure t
-    :config (load-theme 'nord t))
+  ;; (use-package nord-theme
+  ;;   :ensure t
+  ;;   :config (load-theme 'nord t))
+#+end_src
+
+But sometimes, a light theme is preferable:
+
+#+begin_src emacs-lisp
+  ;; (use-package doom-themes
+  ;;   :ensure t
+  ;;   :config (load-theme 'doom-one-light t))
+  
+  ;; (use-package material-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'material-light t)
+  ;;   (set-cursor-color "#444444"))
+  
+  ;; TODO(john): do this!
+  (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/nord-light-emacs/"))
+  (load-theme 'nord-light t)
 #+end_src
 
 *** Font
 #+begin_src emacs-lisp
-  (when (member "Office Code Pro" (font-family-list))
-    (set-face-attribute 'default nil :font "Office Code Pro" :height 140))
+  (cond ((and t (member "Office Code Pro" (font-family-list)))
+         (set-face-attribute 'default nil :font "Office Code Pro" :height 140))
+        ((and nil (member "Alma Mono" (font-family-list)))
+         (set-face-attribute 'default nil :family "Alma Mono" :height 140 :width 'ultra-condensed))
+        (set-face-attribute 'default nil :font "Consolas" :height 140))
 #+end_src
 
 *** Powerline
