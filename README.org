@@ -424,6 +424,16 @@ Put the configuration stuff in =./work.el=. Consult [[https://github.com/ahungry
     (define-key org-jira-entry-mode-map (kbd "C-i if") 'org-jira-get-issues-by-fixversion))
 #+end_src
 
+** Markdown
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+   :init (setq markdown-command '("pandoc" "--from=markdown" "--to=html5")))
+#+end_src
 ** Reading
 #+begin_src emacs-lisp
   (use-package nov
