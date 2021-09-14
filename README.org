@@ -727,6 +727,7 @@ Tide provides all the nice features for TypeScript in Emacs
   (defun setup-tide-mode ()
     "Setup tide mode."
     (interactive)
+    (setq tide-server-max-response-length (* 1024 1024 42))
     (tide-setup)
     (tide-hl-identifier-mode +1)
     (eldoc-mode +1)
