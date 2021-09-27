@@ -737,7 +737,8 @@ Tide provides all the nice features for TypeScript in Emacs
     :ensure t
     :after (typescript-mode company flycheck)
     :bind (("s-." . tide-fix)
-           ("<f12>" . tide-jump-to-definition))
+           ("<f12>" . tide-jump-to-definition)
+           ("S-<f12>" . tide-references))
     :hook ((typescript-mode . setup-tide-mode)))
 #+end_src
 ** Go
