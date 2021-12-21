@@ -445,6 +445,34 @@ Put the configuration stuff in =./work.el=. Consult [[https://github.com/ahungry
   (use-package pdf-tools
     :ensure t)
 #+end_src
+** Writing
+
+Insert a uuid!
+
+#+begin_src emacs-lisp
+  (defun uuid ()
+    "Generate and insert a uuid.
+  From http://ergoemacs.org/emacs/elisp_generate_uuid.html"
+    (interactive)
+    (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                                (user-uid)
+                                (emacs-pid)
+                                (system-name)
+                                (user-full-name)
+                                (current-time)
+                                (emacs-uptime)
+                                (garbage-collect)
+                                (buffer-string)
+                                (random)
+                                (recent-keys)))))
+        (insert (format "%s-%s-4%s-%s%s-%s"
+                        (substring myStr 0 8)
+                        (substring myStr 8 12)
+                        (substring myStr 13 16)
+                        (format "%x" (+ 8 (random 4)))
+                        (substring myStr 17 20)
+                        (substring myStr 20 32)))))
+#+end_src
 * Programming
 ** General
 *** Compilation
