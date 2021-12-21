@@ -220,6 +220,7 @@ Improve the way I navigate the Emacs interface via counsel, swiper, and projecti
      :ensure t
      :bind*
      (("C-s" . swiper)
+      ("s-f" . swiper)
       ("C-c C-r" . ivy-resume)
       ("C-x C-f" . counsel-find-file)
       ("C-c h f" . counsel-describe-function)
