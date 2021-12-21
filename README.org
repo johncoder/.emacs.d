@@ -155,9 +155,9 @@ I'll be relying on =use-package= to set up packages, but it'll need to be fetche
 ** Theme
 I like to use [[https://nordtheme.com][nord]].
 #+begin_src emacs-lisp
-  ;; (use-package nord-theme
-  ;;   :ensure t
-  ;;   :config (load-theme 'nord t))
+  (use-package nord-theme
+    :ensure t
+    :config (load-theme 'nord t))
 #+end_src
 
 But sometimes, a light theme is preferable:
@@ -174,8 +174,8 @@ But sometimes, a light theme is preferable:
   ;;   (set-cursor-color "#444444"))
   
   ;; TODO(john): do this!
-  (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/nord-light-emacs/"))
-  (load-theme 'nord-light t)
+  ;; (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/nord-light-emacs/"))
+  ;; (load-theme 'nord-light t)
 #+end_src
 
 *** Font
