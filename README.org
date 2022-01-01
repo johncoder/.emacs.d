@@ -61,6 +61,19 @@ I want Emacs backup behavior to stay out of my way.
 	    (eq system-type 'gnu/linux))
     (setq create-lockfiles nil))
 #+end_src
+*** Ubuntu Environment
+#+begin_src emacs-lisp
+  (when (or (eq system-type 'gnu/linux) (eq system-type 'linux))
+    (use-package exec-path-from-shell
+      :ensure t
+      :init (progn
+              (exec-path-from-shell-copy-env "SSH_AGENT_PID")
+              (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
+              (exec-path-from-shell-copy-env "GOPATH")
+              (exec-path-from-shell-copy-env "NVM_DIR")
+              (exec-path-from-shell-initialize))))
+#+end_src
+
 ** Editing
 
 By default Emacs does not overwrite a region with new input, unlike virtually every other program in existence.
