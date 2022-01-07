@@ -106,6 +106,21 @@ Change the default =C-a= behavior to jump between the beginning and end of white
 		  'my/smarter-move-beginning-of-line)
 #+end_src
 
+*** Transpose Lines
+#+begin_src emacs-lisp
+  (defun move-line-up ()
+    "Swap the current line with the one above it."
+    (interactive)
+    (transpose-lines 1)
+    (previous-line 2))
+  
+  (defun move-line-down ()
+    "Swap the current line with the one below it."
+    (interactive)
+    (next-line 1)
+    (transpose-lines 1)
+    (previous-line 1))
+#+end_src
 ** Noise
 By default, Emacs makes noise when you do things like try to move past the end of a buffer, which I prefer to disable.
 
@@ -833,6 +848,8 @@ TODO
     (global-set-key (kbd "s-P") 'counsel-M-x)
     (global-set-key (kbd "C-S-G") 'magit-status)
     (global-set-key (kbd "s-w") 'kill-current-buffer)
+    (global-set-key (kbd "M-<down>") 'move-line-down)
+    (global-set-key (kbd "M-<up>") 'move-line-up)
     (global-set-key (kbd "s-,") (lambda ()
                                   (interactive)
                                   (find-file "~/.emacs.d"))))
