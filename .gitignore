@@ -18,3 +18,5 @@ transient
 .lsp-session*
 .org-id-locations
 emacs-auto-custom.el
+.cache
+/themes
