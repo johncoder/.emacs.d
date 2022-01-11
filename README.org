@@ -746,7 +746,52 @@ Tide provides all the nice features for TypeScript in Emacs
     :hook ((typescript-mode . setup-tide-mode)))
 #+end_src
 ** Go
-TODO
+#+begin_src emacs-lisp
+  (add-to-list 'load-path
+      (concat (getenv "GOPATH")
+              "/src/golang.org/x/lint/misc/emacs"))
+  (add-to-list 'load-path
+      (concat (getenv "HOME")
+              "/go/src/golang.org/x/lint/misc/emacs"))
+  (require 'golint)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun jrn-go-mode-hook ()
+    ;; TODO(john): Check and see if I really want to do this...
+    (if (executable-find "goimports")
+        (setq gofmt-command "goimports"))
+
+    (add-hook 'before-save-hook 'gofmt-before-save)
+
+    (setq imenu-generic-expression
+          '(("type" "^[ \t]*type *\\([^ \t\n\r\f]*[ \t]*\\(struct\\|interface\\)\\)" 1)
+            ("func" "^func *\\(.*\\)" 1)))
+
+    (use-package gotest
+      :ensure t
+      :bind (("C-c , f" . go-test-current-file)
+             ("C-c , t" . go-test-current-test)
+             ("C-c , p" . go-test-current-project)))
+
+    (local-set-key (kbd "s-.") 'godef-jump)
+    (local-set-key (kbd "s->") 'pop-tag-mark)
+    (setq tab-width 4
+          go-tab-width 4))
+
+  (use-package go-mode
+    :ensure t
+    :hook (go-mode . jrn-go-mode-hook))
+
+  (use-package flycheck-golangci-lint
+    :ensure t
+    :hook (go-mode . flycheck-golangci-lint-setup))
+  (use-package company-go
+    :ensure t
+    :hook (go-mode . (lambda ()
+                       (set (make-local-variable 'company-backends) '(company-go))
+                       (company-mode))))
+#+end_src
 ** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode
