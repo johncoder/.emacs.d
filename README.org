@@ -1,6 +1,10 @@
 #+TITLE: Emacs Configuration
 #+OPTIONS: toc:nil
 
+TODO:
+
++ Customize my mode line [[http://www.gonsie.com/blorg/modeline.html][like this]]
+
 * General
 ** Fundamental Tweaks
 
@@ -743,6 +747,11 @@ Tide provides all the nice features for TypeScript in Emacs
 #+end_src
 ** Go
 TODO
+** Rust
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :ensure t)
+#+end_src
 ** Ruby
 #+begin_src emacs-lisp
   (use-package ruby-mode
