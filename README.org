@@ -110,6 +110,21 @@ Change the default =C-a= behavior to jump between the beginning and end of white
 		  'my/smarter-move-beginning-of-line)
 #+end_src
 
+*** Transpose Lines
+#+begin_src emacs-lisp
+  (defun move-line-up ()
+    "Swap the current line with the one above it."
+    (interactive)
+    (transpose-lines 1)
+    (previous-line 2))
+  
+  (defun move-line-down ()
+    "Swap the current line with the one below it."
+    (interactive)
+    (next-line 1)
+    (transpose-lines 1)
+    (previous-line 1))
+#+end_src
 ** Noise
 By default, Emacs makes noise when you do things like try to move past the end of a buffer, which I prefer to disable.
 
@@ -159,9 +174,9 @@ I'll be relying on =use-package= to set up packages, but it'll need to be fetche
 ** Theme
 I like to use [[https://nordtheme.com][nord]].
 #+begin_src emacs-lisp
-  ;; (use-package nord-theme
-  ;;   :ensure t
-  ;;   :config (load-theme 'nord t))
+  (use-package nord-theme
+    :ensure t
+    :config (load-theme 'nord t))
 #+end_src
 
 But sometimes, a light theme is preferable:
@@ -178,8 +193,8 @@ But sometimes, a light theme is preferable:
   ;;   (set-cursor-color "#444444"))
   
   ;; TODO(john): do this!
-  (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/nord-light-emacs/"))
-  (load-theme 'nord-light t)
+  ;; (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/nord-light-emacs/"))
+  ;; (load-theme 'nord-light t)
 #+end_src
 
 *** Font
@@ -224,6 +239,7 @@ Improve the way I navigate the Emacs interface via counsel, swiper, and projecti
      :ensure t
      :bind*
      (("C-s" . swiper)
+      ("s-f" . swiper)
       ("C-c C-r" . ivy-resume)
       ("C-x C-f" . counsel-find-file)
       ("C-c h f" . counsel-describe-function)
@@ -448,6 +464,34 @@ Put the configuration stuff in =./work.el=. Consult [[https://github.com/ahungry
   
   (use-package pdf-tools
     :ensure t)
+#+end_src
+** Writing
+
+Insert a uuid!
+
+#+begin_src emacs-lisp
+  (defun uuid ()
+    "Generate and insert a uuid.
+  From http://ergoemacs.org/emacs/elisp_generate_uuid.html"
+    (interactive)
+    (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
+                                (user-uid)
+                                (emacs-pid)
+                                (system-name)
+                                (user-full-name)
+                                (current-time)
+                                (emacs-uptime)
+                                (garbage-collect)
+                                (buffer-string)
+                                (random)
+                                (recent-keys)))))
+        (insert (format "%s-%s-4%s-%s%s-%s"
+                        (substring myStr 0 8)
+                        (substring myStr 8 12)
+                        (substring myStr 13 16)
+                        (format "%x" (+ 8 (random 4)))
+                        (substring myStr 17 20)
+                        (substring myStr 20 32)))))
 #+end_src
 * Programming
 ** General
@@ -858,6 +902,8 @@ Tide provides all the nice features for TypeScript in Emacs
     (global-set-key (kbd "s-P") 'counsel-M-x)
     (global-set-key (kbd "C-S-G") 'magit-status)
     (global-set-key (kbd "s-w") 'kill-current-buffer)
+    (global-set-key (kbd "M-<down>") 'move-line-down)
+    (global-set-key (kbd "M-<up>") 'move-line-up)
     (global-set-key (kbd "s-,") (lambda ()
                                   (interactive)
                                   (find-file "~/.emacs.d"))))
