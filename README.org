@@ -4,6 +4,7 @@
 TODO:
 
 + Customize my mode line [[http://www.gonsie.com/blorg/modeline.html][like this]]
++ Experiment with =ts-ls= via [[https://emacs-lsp.github.io/lsp-mode/page/lsp-typescript/][lsp-mode docs]] (drop tide for =typescript-mode=? will this work with tsx?)
 
 * General
 ** Fundamental Tweaks
