@@ -791,13 +791,15 @@ Tide provides all the nice features for TypeScript in Emacs
 #+end_src
 ** Go
 #+begin_src emacs-lisp
-  (add-to-list 'load-path
-      (concat (getenv "GOPATH")
-              "/src/golang.org/x/lint/misc/emacs"))
-  (add-to-list 'load-path
-      (concat (getenv "HOME")
-              "/go/src/golang.org/x/lint/misc/emacs"))
-  (require 'golint)
+  (when (not (eq (getenv "GOPATH") nil))
+    (add-to-list 'load-path
+                 (concat (getenv "GOPATH")
+                         "/src/golang.org/x/lint/misc/emacs"))
+    (add-to-list 'load-path
+                 (concat (getenv "HOME")
+                         "/go/src/golang.org/x/lint/misc/emacs"))
+    ;; (require 'golint)
+    (use-package golint :defer t))
 #+end_src
 
 #+begin_src emacs-lisp
