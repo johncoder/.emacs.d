@@ -908,6 +908,7 @@ Tide provides all the nice features for TypeScript in Emacs
                                       (ansi-term "/bin/zsh"))
                                     (switch-to-buffer "*ansi-term*")))))
   (global-set-key (kbd "s-k") 'cantrip-run)
+  (global-set-key (kbd "C-x a r") 'cantrip-run)
 #+end_src
 
 ** VS Code Style Bindings
