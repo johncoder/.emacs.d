@@ -602,9 +602,23 @@ This adds the ability to expand selection from the point
   
   (use-package lsp-mode
     :ensure t
-    :hook ((go-mode . lsp)
-	   (ruby-mode . lsp))
-    :commands lsp)
+    :hook (
+           (go-mode . lsp)
+           (ruby-mode . lsp)
+           (typescript-mode . lsp)
+           (web-mode . lsp-deferred)
+           )
+    :commands lsp
+    :config
+    (setq lsp-log-io nil)
+    (setq lsp-restart 'auto-restart)
+    (setq lsp-ui-sideline-show-diagnostics t)
+    (setq lsp-ui-sideline-show-hover t)
+    (setq lsp-ui-sideline-show-code-actions t))
+  
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
 #+end_src
 *** Web Mode
 #+begin_src emacs-lisp
@@ -803,13 +817,13 @@ Tide provides all the nice features for TypeScript in Emacs
     (eldoc-mode +1)
     (company-mode +1))
   
-  (use-package tide
-    :ensure t
-    :after (typescript-mode company flycheck)
-    :bind (("s-." . tide-fix)
-           ("<f12>" . tide-jump-to-definition)
-           ("S-<f12>" . tide-references))
-    :hook ((typescript-mode . setup-tide-mode)))
+  ;; (use-package tide
+  ;;   :ensure t
+  ;;   :after (typescript-mode company flycheck)
+  ;;   :bind (("s-." . tide-fix)
+  ;;          ("<f12>" . tide-jump-to-definition)
+  ;;          ("S-<f12>" . tide-references))
+  ;;   :hook ((typescript-mode . setup-tide-mode)))
 #+end_src
 ** Go
 #+begin_src emacs-lisp
@@ -925,6 +939,8 @@ and have some portable muscle memory. These are [[https://duckduckgo.com/?q=vs+c
 found to be convenient enough for use every day in Emacs:
 
 #+begin_src emacs-lisp
+  (global-set-key (kbd "<f12>") 'lsp-find-definition)
+  (global-set-key (kbd "s-<f12>") 'lsp-find-type-implementation)
   (global-set-key (kbd "C-S-G") 'magit-status)
   (global-set-key (kbd "M-<down>") 'move-line-down)
   (global-set-key (kbd "M-<up>") 'move-line-up)
