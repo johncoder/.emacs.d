@@ -575,6 +575,14 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
     :hook (typescript-mode fundamental-mode lisp-mode emacs-lisp-mode web-mode org-mode)
     :delight)
 #+end_src
+*** Expand Region
+This adds the ability to expand selection from the point
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind (("C-=" . er/expand-region)
+           ("C-+" . er/contract-region)))
+#+end_src
 *** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
