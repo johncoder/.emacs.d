@@ -621,11 +621,13 @@ This adds the ability to expand selection from the point
     :commands lsp-ui-mode)
 #+end_src
 *** Web Mode
+The setup for web-mode with lsp-mode isn't quite right? It worked better out of the box with tide. Here's a [[https://github.com/emacs-typescript/typescript.el/issues/4][thread]] to look at later to try and smooth things over.
+
 #+begin_src emacs-lisp
   (defun setup-web-mode ()
     (interactive)
-    (when (string-equal "tsx" (file-name-extension buffer-file-name))
-      (setup-tide-mode))
+    ;; (when (string-equal "tsx" (file-name-extension buffer-file-name))
+    ;;   (setup-tide-mode))
     (setq indent-tabs-mode nil))
   
   (flycheck-add-mode 'typescript-tslint 'web-mode)
@@ -638,16 +640,15 @@ This adds the ability to expand selection from the point
     :hook ((web-mode . setup-web-mode))
     :config
     (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
     (setq web-mode-script-padding 2)
     (setq web-mode-block-padding 2)
     (setq web-mode-style-padding 2)
     (setq web-mode-enable-auto-pairing t)
     (setq web-mode-enable-current-element-highlight t)
     (setq web-mode-enable-auto-closing t)
-    (setq web-mode-enable-auto-quoting t)
-    (setq web-mode-markup-indent-offset 2))
+    (setq web-mode-enable-auto-quoting t))
 #+end_src
 *** Rest Client
 #+begin_src emacs-lisp
@@ -808,14 +809,14 @@ Tide provides all the nice features for TypeScript in Emacs
   (setq js2-basic-offset 2)
   (setq company-tooltip-align-annotations t)
   
-  (defun setup-tide-mode ()
-    "Setup tide mode."
-    (interactive)
-    (setq tide-server-max-response-length (* 1024 1024 42))
-    (tide-setup)
-    (tide-hl-identifier-mode +1)
-    (eldoc-mode +1)
-    (company-mode +1))
+  ;; (defun setup-tide-mode ()
+  ;;   "Setup tide mode."
+  ;;   (interactive)
+  ;;   (setq tide-server-max-response-length (* 1024 1024 42))
+  ;;   (tide-setup)
+  ;;   (tide-hl-identifier-mode +1)
+  ;;   (eldoc-mode +1)
+  ;;   (company-mode +1))
   
   ;; (use-package tide
   ;;   :ensure t
