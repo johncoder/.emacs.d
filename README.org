@@ -628,7 +628,8 @@ The setup for web-mode with lsp-mode isn't quite right? It worked better out of 
     (interactive)
     ;; (when (string-equal "tsx" (file-name-extension buffer-file-name))
     ;;   (setup-tide-mode))
-    (setq indent-tabs-mode nil))
+    (setq indent-tabs-mode nil)
+    (setq standard-indent 2))
   
   (flycheck-add-mode 'typescript-tslint 'web-mode)
   
