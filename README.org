@@ -237,6 +237,13 @@ But sometimes, a light theme is preferable:
     :config (setq cwm-centered-window-width 120))
 #+end_src
 ** Productivity
+Transient is a must!
+
+#+begin_src emacs-lisp
+  (use-package transient
+    :ensure t)
+#+end_src
+
 Improve the way I navigate the Emacs interface via counsel, swiper, and projectile.
 #+begin_src emacs-lisp
   (use-package counsel
