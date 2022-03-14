@@ -238,6 +238,13 @@ But sometimes, a light theme is preferable:
     :config (setq cwm-centered-window-width 120))
 #+end_src
 ** Productivity
+Transient is a must!
+
+#+begin_src emacs-lisp
+  (use-package transient
+    :ensure t)
+#+end_src
+
 Improve the way I navigate the Emacs interface via counsel, swiper, and projectile.
 #+begin_src emacs-lisp
   (use-package counsel
@@ -576,6 +583,14 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
     :hook (typescript-mode fundamental-mode lisp-mode emacs-lisp-mode web-mode org-mode)
     :delight)
 #+end_src
+*** Expand Region
+This adds the ability to expand selection from the point
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind (("C-=" . er/expand-region)
+           ("C-+" . er/contract-region)))
+#+end_src
 *** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
@@ -595,17 +610,34 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
   
   (use-package lsp-mode
     :ensure t
-    :hook ((go-mode . lsp)
-	   (ruby-mode . lsp))
-    :commands lsp)
+    :hook (
+           (go-mode . lsp)
+           (ruby-mode . lsp)
+           (typescript-mode . lsp)
+           (web-mode . lsp-deferred)
+           )
+    :commands lsp
+    :config
+    (setq lsp-log-io nil)
+    (setq lsp-restart 'auto-restart)
+    (setq lsp-ui-sideline-show-diagnostics t)
+    (setq lsp-ui-sideline-show-hover t)
+    (setq lsp-ui-sideline-show-code-actions t))
+  
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
 #+end_src
 *** Web Mode
+The setup for web-mode with lsp-mode isn't quite right? It worked better out of the box with tide. Here's a [[https://github.com/emacs-typescript/typescript.el/issues/4][thread]] to look at later to try and smooth things over.
+
 #+begin_src emacs-lisp
   (defun setup-web-mode ()
     (interactive)
-    (when (string-equal "tsx" (file-name-extension buffer-file-name))
-      (setup-tide-mode))
-    (setq indent-tabs-mode nil))
+    ;; (when (string-equal "tsx" (file-name-extension buffer-file-name))
+    ;;   (setup-tide-mode))
+    (setq indent-tabs-mode nil)
+    (setq standard-indent 2))
   
   (flycheck-add-mode 'typescript-tslint 'web-mode)
   
@@ -617,16 +649,15 @@ I tend to leave comment markers in code, and it's helpful to highlight them to b
     :hook ((web-mode . setup-web-mode))
     :config
     (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
     (setq web-mode-script-padding 2)
     (setq web-mode-block-padding 2)
     (setq web-mode-style-padding 2)
     (setq web-mode-enable-auto-pairing t)
     (setq web-mode-enable-current-element-highlight t)
     (setq web-mode-enable-auto-closing t)
-    (setq web-mode-enable-auto-quoting t)
-    (setq web-mode-markup-indent-offset 2))
+    (setq web-mode-enable-auto-quoting t))
 #+end_src
 *** Rest Client
 #+begin_src emacs-lisp
@@ -787,22 +818,22 @@ Tide provides all the nice features for TypeScript in Emacs
   (setq js2-basic-offset 2)
   (setq company-tooltip-align-annotations t)
   
-  (defun setup-tide-mode ()
-    "Setup tide mode."
-    (interactive)
-    (setq tide-server-max-response-length (* 1024 1024 42))
-    (tide-setup)
-    (tide-hl-identifier-mode +1)
-    (eldoc-mode +1)
-    (company-mode +1))
+  ;; (defun setup-tide-mode ()
+  ;;   "Setup tide mode."
+  ;;   (interactive)
+  ;;   (setq tide-server-max-response-length (* 1024 1024 42))
+  ;;   (tide-setup)
+  ;;   (tide-hl-identifier-mode +1)
+  ;;   (eldoc-mode +1)
+  ;;   (company-mode +1))
   
-  (use-package tide
-    :ensure t
-    :after (typescript-mode company flycheck)
-    :bind (("s-." . tide-fix)
-           ("<f12>" . tide-jump-to-definition)
-           ("S-<f12>" . tide-references))
-    :hook ((typescript-mode . setup-tide-mode)))
+  ;; (use-package tide
+  ;;   :ensure t
+  ;;   :after (typescript-mode company flycheck)
+  ;;   :bind (("s-." . tide-fix)
+  ;;          ("<f12>" . tide-jump-to-definition)
+  ;;          ("S-<f12>" . tide-references))
+  ;;   :hook ((typescript-mode . setup-tide-mode)))
 #+end_src
 ** Go
 #+begin_src emacs-lisp
@@ -918,6 +949,8 @@ and have some portable muscle memory. These are [[https://duckduckgo.com/?q=vs+c
 found to be convenient enough for use every day in Emacs:
 
 #+begin_src emacs-lisp
+  (global-set-key (kbd "<f12>") 'lsp-find-definition)
+  (global-set-key (kbd "s-<f12>") 'lsp-find-type-implementation)
   (global-set-key (kbd "C-S-G") 'magit-status)
   (global-set-key (kbd "M-<down>") 'move-line-down)
   (global-set-key (kbd "M-<up>") 'move-line-up)
