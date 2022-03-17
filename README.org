@@ -512,14 +512,20 @@ I like to keep my org files around, and sometimes I'm forgetful about creating t
       ("r" "Reference" (lambda () (interactive) (org-capture nil "h")))]])
 
   (transient-define-prefix jrn/capture-templates ()
+    "Open an organized transient of my org-capture templates."
     ["Capture Templates"
-     ["Categories"
-      ("w" "Work" jrn/capture-templates/work)
-      ("s" "Studies" jrn/capture-templates/studies)
-      ("p" "Personal" jrn/capture-templates/personal)]
-     ["Extras"
-      ("i" "org-info" org-info)
-      ("c" "org-capture" org-capture)]])
+     ("q" "quit" (lambda () (interactive)))]
+    ["Directories"
+      ("W" "Work" (lambda () (interactive) (dired jrn/org-files/work)))
+      ("S" "Studies" (lambda () (interactive) (dired jrn/org-files/studies)))
+      ("P" "Personal" (lambda () (interactive) (dired jrn/org-files/personal)))]
+    ["Categories"
+     ("w" "Work" jrn/capture-templates/work)
+     ("s" "Studies" jrn/capture-templates/studies)
+     ("p" "Personal" jrn/capture-templates/personal)]
+    ["Extras"
+     ("i" "org-info" org-info)
+     ("c" "org-capture" org-capture)])
 
   (global-set-key (kbd "C-c c") 'jrn/capture-templates)
 #+end_src
