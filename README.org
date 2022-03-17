@@ -359,7 +359,7 @@ Org keybindings
 
 #+begin_src emacs-lisp
   (define-key global-map "\C-ca" 'org-agenda)
-  (define-key global-map "\C-cc" 'org-capture)
+  ;; (define-key global-map "\C-cc" 'org-capture)
   (define-key global-map "\C-cl" 'org-store-link)
 #+end_src
 
@@ -419,16 +419,109 @@ I like to keep my org files around, and sometimes I'm forgetful about creating t
 #+end_src
   
 #+begin_src emacs-lisp
-    (setq org-capture-templates
-	  '(
-	    ("a" "Agenda Item"           entry (file+headline "~/org/agenda.org" "inbox") "* TODO %?\nSCHEDULED: %T\n")
-	    ("c" "Clock item"            item  (clock) "  - %i%?")
-	    ("w" "Work Note"             entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n")
-	    ("r" "Work Note (reference)" entry (file+headline "~/org/work.org" "inbox") "* TODO %?\n%a\n")
-	    ("j" "Append journal entry"  entry (file+datetree "~/org/journal.org")      "* %U %^{Title}\n%?")
-	    ("t" "Micro Blog Entry"      plain (file+headline "~/org/micro-blog.org" "Micro Blog")   "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
-	    ("f" "Flash Card"            entry (file+headline "~/org/notes/inbox.org" "new") "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
-	    ))
+  (setq jrn/org-files/work "~/org/work")
+  (setq jrn/org-files/work/inbox "~/org/work/inbox.org")
+  (setq jrn/org-files/studies "~/org/studies")
+  (setq jrn/org-files/studies/inbox "~/org/studies/inbox.org")
+  (setq jrn/org-files/personal "~/org/personal")
+  (setq jrn/org-files/personal/inbox "~/org/personal/inbox.org")
+
+  (unless (file-exists-p jrn/org-files/work)
+    (make-directory jrn/org-files/work t))
+  (unless (file-exists-p jrn/org-files/studies)
+    (make-directory jrn/org-files/studies t))
+  (unless (file-exists-p jrn/org-files/personal)
+    (make-directory jrn/org-files/personal t))
+
+  (setq org-capture-templates
+        '(;; ---- MISC ----
+          ("j" "Append journal entry"
+           entry (file+datetree "~/org/journal.org")
+           "* %U %^{Title}\n%?")
+
+          ("t" "Micro Blog Entry"
+           plain (file+headline "~/org/personal/micro-blog.org" "Micro Blog")
+           "** %U by @johncoder %^g\n%?" :prepend t :kill-buffer t)
+
+          ;; ---- WORK ----
+          ("a" "Work Agenda Item"
+           entry (file+headline jrn/org-files/work/inbox "inbox")
+           "* TODO %?\nSCHEDULED: %T\n")
+
+          ("w" "Work Note"
+           entry (file+headline jrn/org-files/work/inbox "inbox")
+           "* TODO %?\n")
+
+          ("r" "Work Note (reference)"
+           entry (file+headline jrn/org-files/work/inbox "inbox")
+           "* TODO %?\n%a\n")
+
+          ("f" "Work Flash Card"
+           entry (file+headline (concat jrn/org-files/work "/flashcards.org") "all")
+           "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
+
+          ;; ---- STUDIES ----
+          ("p" "Studies Agenda Item"
+           entry (file+headline jrn/org-files/studies/inbox "inbox")
+           "* TODO %?\nSCHEDULED: %T\n")
+
+          ("o" "Studies Note"
+           entry (file+headline jrn/org-files/studies/inbox "inbox")
+           "* TODO %?\n")
+
+          ("i" "Studies Note (reference)"
+           entry (file+headline jrn/org-files/studies/inbox "inbox")
+           "* TODO %?\n%a\n")
+
+          ("u" "Studies Flash Card"
+           entry (file+headline jrn/org-files/studies/inbox "all")
+           "* Flash Card: %^{Title} :drill:\n%^{Question}\n\n** Answer\nLINK: %a\n\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE")
+
+          ;; ---- PERSONAL ----
+          ("l" "Personal Agenda Item"
+           entry (file+headline jrn/org-files/personal/inbox "inbox")
+           "* TODO %?\nSCHEDULED: %T\n")
+
+          ("k" "Personal Note"
+           entry (file+headline jrn/org-files/personal/inbox "inbox")
+           "* TODO %?\n")
+
+          ("h" "Personal Note (reference)"
+           entry (file+headline jrn/org-files/personal/inbox "inbox")
+           "* TODO %?\n%a\n")
+          ))
+
+  (transient-define-prefix jrn/capture-templates/work ()
+    ["Work (Capture Templates)"
+     [("a" "Agenda Item" (lambda () (interactive) (org-capture nil "a")))
+      ("n" "Note" (lambda () (interactive) (org-capture nil "w")))
+      ("r" "Reference" (lambda () (interactive) (org-capture nil "r")))
+      ("f" "Flash Card" (lambda () (interactive) (org-capture nil "f")))]])
+
+  (transient-define-prefix jrn/capture-templates/studies ()
+    ["Studies (Capture Templates)"
+     [("a" "Agenda Item" (lambda () (interactive) (org-capture nil "p")))
+      ("n" "Note" (lambda () (interactive) (org-capture nil "o")))
+      ("r" "Reference" (lambda () (interactive) (org-capture nil "i")))
+      ("f" "Flash Card" (lambda () (interactive) (org-capture nil "u")))]])
+
+  (transient-define-prefix jrn/capture-templates/personal ()
+    ["Personal (Capture Templates)"
+     [("a" "Agenda Item" (lambda () (interactive) (org-capture nil "l")))
+      ("n" "Note" (lambda () (interactive) (org-capture nil "k")))
+      ("r" "Reference" (lambda () (interactive) (org-capture nil "h")))]])
+
+  (transient-define-prefix jrn/capture-templates ()
+    ["Capture Templates"
+     ["Categories"
+      ("w" "Work" jrn/capture-templates/work)
+      ("s" "Studies" jrn/capture-templates/studies)
+      ("p" "Personal" jrn/capture-templates/personal)]
+     ["Extras"
+      ("i" "org-info" org-info)
+      ("c" "org-capture" org-capture)]])
+
+  (global-set-key (kbd "C-c c") 'jrn/capture-templates)
 #+end_src
 
 *** Jira
