@@ -720,9 +720,9 @@ This adds the ability to expand selection from the point
     :config
     (setq lsp-log-io nil)
     (setq lsp-restart 'auto-restart)
-    (setq lsp-ui-sideline-show-diagnostics t)
-    (setq lsp-ui-sideline-show-hover t)
-    (setq lsp-ui-sideline-show-code-actions t))
+    (setq lsp-ui-sideline-show-diagnostics nil)
+    (setq lsp-ui-sideline-show-hover nil)
+    (setq lsp-ui-sideline-show-code-actions nil))
   
   (use-package lsp-ui
     :ensure t
@@ -1057,6 +1057,13 @@ found to be convenient enough for use every day in Emacs:
   (global-set-key (kbd "s-,") (lambda ()
                                 (interactive)
                                 (find-file "~/.emacs.d")))
+
+  (when (eq system-type 'gnu/linux)
+    ;; TODO:
+    ;; (global-set-key (kbd "M-F") 'format-document)
+    (global-unset-key (kbd "M-k"))
+    (global-set-key (kbd "M-k M-c") 'comment-line)
+    (global-set-key (kbd "M-k M-u") 'uncomment-region))
 #+end_src
 
 Some macOS bindings for VS Code:
