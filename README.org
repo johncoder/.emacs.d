@@ -332,7 +332,7 @@ The =org-plus-contrib= package is essential.
 Settings
 
 #+begin_src emacs-lisp
-  (setq org-agenda-files (list "~/org"))
+  (setq org-agenda-files (list "~/org" "~/org/studies"))
   (setf org-refile-targets '((org-agenda-files :maxlevel . 2))
         org-startup-indented t
         org-agenda-span 'day
@@ -423,6 +423,7 @@ I like to keep my org files around, and sometimes I'm forgetful about creating t
   (setq jrn/org-files/work/inbox "~/org/work/inbox.org")
   (setq jrn/org-files/studies "~/org/studies")
   (setq jrn/org-files/studies/inbox "~/org/studies/inbox.org")
+  (setq jrn/org-files/studies/flashcards "~/org/studies/flashcards.org")
   (setq jrn/org-files/personal "~/org/personal")
   (setq jrn/org-files/personal/inbox "~/org/personal/inbox.org")
 
